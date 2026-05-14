@@ -1,0 +1,1880 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lingfeng Kevin Ge — Electrical Engineering</title>
+<meta name="description" content="Lingfeng Kevin Ge — Electrical Engineering at the University of Waterloo. Power systems, controls, and the things that hum between them.">
+
+<!-- ============================================================
+     FONTS — Fraunces (display variable serif) · Outfit (body) ·
+     JetBrains Mono (mono labels). All Google Fonts.
+============================================================ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@200..600&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   1.  TOKENS
+   The full palette of the abyss-to-sky descent + type + motion.
+   Edit a value here and it propagates through every section.
+============================================================ */
+:root {
+  /* Color — vertical journey */
+  --abyss:#02060f; --midnight:#060d1f; --deep-night:#0a1430; --navy:#0f2348;
+  --ocean:#1a3a6b; --deep-blue:#2563ac; --sea:#4a8bc9; --sky:#7ab8e8;
+  --baby:#b8d9f0; --seafoam:#c8e8e0; --teal:#2db4a0;
+  --electric:#5dd9f5; --bolt:#9ce8ff;
+  --silver:#cad4e0; --silver-glow:#e4ecf5; --paper:#eef4fa; --ink:#02060f;
+
+  /* Semantic */
+  --fg:var(--paper); --fg-strong:var(--silver-glow);
+  --fg-muted:rgba(238,244,250,.62); --fg-dim:rgba(238,244,250,.4);
+  --rule:rgba(202,212,224,.18); --rule-bright:rgba(93,217,245,.4);
+  --glass:rgba(6,13,31,.55); --glass-bright:rgba(238,244,250,.06);
+  --glass-border:rgba(202,212,224,.18);
+
+  /* Type families */
+  --font-display:'Fraunces','Times New Roman',Georgia,serif;
+  --font-body:'Outfit','Helvetica Neue',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono','SFMono-Regular',Menlo,Consolas,monospace;
+
+  /* Spacing rhythm */
+  --section-py:clamp(80px,12vh,160px);
+  --gutter:clamp(24px,5vw,80px);
+  --maxw:1240px;
+
+  /* Radii */
+  --r-1:4px; --r-2:8px; --r-3:14px; --r-4:22px; --r-pill:999px;
+
+  /* Motion */
+  --ease-water:cubic-bezier(.22,.61,.36,1);
+  --ease-spark:cubic-bezier(.7,0,.2,1);
+  --dur-fast:180ms; --dur:320ms; --dur-slow:620ms;
+}
+
+/* ============================================================
+   2.  RESET + BASE
+============================================================ */
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html {
+  scroll-behavior:smooth;
+  -webkit-text-size-adjust:100%;
+  background:var(--abyss); /* canvas fallback under the unified bg layers */
+}
+body {
+  font-family:var(--font-body);
+  font-weight:300;
+  font-size:1.05rem;
+  line-height:1.55;
+  color:var(--fg);
+  background:transparent; /* the page-level color field lives in .bg-base only */
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  overflow-x:hidden;
+}
+
+/* ============================================================
+   2a. UNIFIED BACKGROUND — one base, one overlay, one dither.
+   This is the ONLY place the page-level color field is painted.
+   No section, card, or container sets a background that
+   contributes to this field — they must remain transparent.
+============================================================ */
+.bg-base, .bg-noise, .bg-overlay {
+  position:fixed; inset:0; pointer-events:none;
+}
+/* Continuous vertical color field, interpolated in OKLCH so the
+   midtones stay perceptually clean instead of muddying through RGB. */
+.bg-base {
+  z-index:-3;
+  background:linear-gradient(180deg in oklch,
+    var(--abyss)      0%,
+    var(--midnight)   22%,
+    var(--deep-night) 44%,
+    var(--ocean)      64%,
+    var(--deep-night) 82%,
+    var(--abyss)     100%);
+}
+/* Procedural noise to break 8-bit quantization banding across the
+   low-contrast deep blues. Pure dither — composited via overlay. */
+.bg-noise {
+  z-index:-2;
+  opacity:.05;
+  mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-size:240px 240px;
+}
+/* Ambient animation, fully decoupled from the base. Composites on
+   top via screen blend — toggling this layer off leaves the base
+   pixel-identical. */
+.bg-overlay {
+  z-index:-1;
+  mix-blend-mode:screen;
+  opacity:.30;
+  background:
+    radial-gradient(ellipse 60% 50% at 28% 22%, color-mix(in oklch, var(--electric) 26%, transparent), transparent 65%),
+    radial-gradient(ellipse 55% 45% at 78% 58%, color-mix(in oklch, var(--teal)     22%, transparent), transparent 70%),
+    radial-gradient(ellipse 70% 55% at 50% 92%, color-mix(in oklch, var(--deep-blue) 28%, transparent), transparent 70%);
+  background-size:220% 220%, 240% 240%, 200% 200%;
+  background-position:0% 0%, 100% 0%, 50% 100%;
+  animation:ambientDrift 42s var(--ease-water) infinite alternate;
+  will-change:background-position;
+}
+@keyframes ambientDrift {
+  from { background-position:0% 0%, 100% 0%, 50% 100%; }
+  to   { background-position:100% 100%, 0% 100%, 0% 0%; }
+}
+img,svg { display:block; max-width:100%; }
+a { color:var(--electric); text-decoration:none; }
+button { font:inherit; color:inherit; background:none; border:0; cursor:pointer; }
+::selection { background:var(--electric); color:var(--abyss); }
+
+.wrap { max-width:var(--maxw); margin:0 auto; padding:0 var(--gutter); }
+
+/* ============================================================
+   3.  ATMOSPHERE LAYERS — bubbles + sparks
+   Both fixed, full-viewport, pointer-events none. Stacked
+   below content via z-index but above each section bg.
+============================================================ */
+.atmosphere { position:fixed; inset:0; pointer-events:none; z-index:1; overflow:hidden; }
+
+.bubble {
+  position:absolute;
+  bottom:-120px;
+  border-radius:50%;
+  background:radial-gradient(circle at 30% 30%, rgba(228,236,245,.25), rgba(202,212,224,.04) 60%, transparent 70%);
+  border:1px solid rgba(202,212,224,.18);
+  animation:rise linear infinite;
+  will-change:transform,opacity;
+  opacity:0;
+}
+@keyframes rise {
+  0%   { transform:translate3d(0, 0, 0) translateX(0);                     opacity:0; }
+  10%  {                                                                   opacity:.9; }
+  90%  {                                                                   opacity:.7; }
+  100% { transform:translate3d(0, calc(-100vh - 240px), 0) translateX(var(--drift,40px)); opacity:0; }
+}
+
+.spark {
+  position:absolute;
+  width:6px; height:6px;
+  border-radius:50%;
+  background:var(--bolt);
+  opacity:0;
+  animation:sparkBurst 8s var(--ease-spark) infinite;
+  will-change:opacity,transform,box-shadow;
+}
+@keyframes sparkBurst {
+  0%, 91.99% { opacity:0; transform:scale(.6); box-shadow:none; }
+  92%        { opacity:1; transform:scale(1.4);
+               box-shadow:0 0 4px var(--bolt), 0 0 14px var(--electric), 0 0 32px rgba(93,217,245,.6); }
+  94%        { opacity:.9; transform:scale(2.2);
+               box-shadow:0 0 6px var(--bolt), 0 0 22px var(--electric), 0 0 48px rgba(93,217,245,.5); }
+  96%        { opacity:.4; transform:scale(1.6);
+               box-shadow:0 0 3px var(--bolt), 0 0 12px var(--electric); }
+  100%       { opacity:0; transform:scale(.6); box-shadow:none; }
+}
+
+/* ============================================================
+   4.  NAV — fixed, glassmorphic
+============================================================ */
+.nav {
+  position:fixed; top:0; left:0; right:0; z-index:50;
+  background:rgba(2,6,15,.55);
+  backdrop-filter:blur(18px) saturate(140%);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  border-bottom:1px solid var(--rule);
+}
+.nav-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:18px var(--gutter);
+}
+.brand {
+  font-family:var(--font-display); font-style:italic; font-weight:300;
+  font-size:1.35rem; letter-spacing:-.01em; color:var(--fg-strong);
+  display:inline-flex; align-items:baseline; gap:0;
+}
+.brand .dot { color:var(--electric); }
+.nav-links { display:flex; gap:30px; list-style:none; }
+.nav-links a {
+  font-family:var(--font-mono); font-size:.74rem; font-weight:500;
+  letter-spacing:.16em; text-transform:uppercase;
+  color:var(--fg-muted);
+  position:relative; padding:6px 0;
+  transition:color var(--dur) var(--ease-water);
+}
+.nav-links a::after {
+  content:""; position:absolute; left:0; bottom:0; height:1px; width:0;
+  background:linear-gradient(90deg, var(--electric), var(--bolt));
+  transition:width var(--dur) var(--ease-water);
+}
+.nav-links a:hover { color:var(--electric); }
+.nav-links a:hover::after { width:100%; }
+
+/* ============================================================
+   5.  WAVE DIVIDER (reusable)
+   Pure SVG art layered between sections. Has NO background of
+   its own — the unified .bg-base shows through. The waves are
+   decorative silhouettes drifting horizontally over the base.
+============================================================ */
+.wave-divider {
+  position:relative; display:block; width:100%;
+  height:clamp(240px, 24vh, 280px);
+  overflow:hidden; z-index:2;
+  background:transparent;
+}
+.wave-divider svg {
+  position:absolute; left:0; top:0;
+  width:200%; height:100%;
+  will-change:transform;
+}
+.wave-divider .w1 { animation:waveSlideA 33s linear infinite; opacity:.55; will-change:transform; }
+.wave-divider .w2 { animation:waveSlideB 27s linear infinite; opacity:.78; will-change:transform; }
+.wave-divider .w3 { animation:waveSlideA 19s linear infinite; opacity:1;   will-change:transform; }
+@keyframes waveSlideA { from { transform:translate3d(0,0,0); } to { transform:translate3d(-50%,0,0); } }
+@keyframes waveSlideB { from { transform:translate3d(-50%,0,0); } to { transform:translate3d(0,0,0); } }
+
+/* ============================================================
+   6.  SECTION FRAMES — shared chrome
+============================================================ */
+section { position:relative; z-index:3; }
+.section-pad { padding:var(--section-py) 0; }
+.section-head { margin-bottom:64px; }
+.section-no {
+  font-family:var(--font-mono); font-size:.78rem; font-weight:500;
+  letter-spacing:.32em; text-transform:uppercase; color:var(--fg-muted);
+  display:block; margin-bottom:14px;
+}
+.section-title {
+  font-family:var(--font-display); font-weight:300;
+  font-size:clamp(2.6rem,5vw,4.2rem); line-height:1.05;
+  letter-spacing:-.02em; color:var(--fg-strong);
+  text-wrap:balance;
+}
+.section-title em { font-style:italic; font-weight:300; color:var(--baby); }
+.section-tagline {
+  font-family:var(--font-display); font-style:italic; font-weight:300;
+  font-size:1.25rem; line-height:1.5; color:var(--fg-muted);
+  max-width:520px; margin-top:18px;
+}
+.head-row { display:flex; justify-content:space-between; align-items:flex-end; gap:48px; flex-wrap:wrap; }
+.head-row .section-tagline { text-align:right; }
+
+/* ============================================================
+   7.  HERO
+============================================================ */
+.hero {
+  position:relative;
+  min-height:100vh;
+  display:flex; align-items:center; justify-content:center;
+  text-align:center;
+  padding:120px var(--gutter) 80px;
+  overflow:hidden;
+  background:transparent; /* unified .bg-base paints the color field */
+}
+/* Moonlight shimmer */
+.hero::before {
+  content:""; position:absolute; left:50%; top:18%;
+  width:min(820px,80vw); height:280px;
+  transform:translateX(-50%);
+  background:radial-gradient(ellipse at center, rgba(228,236,245,.18), rgba(202,212,224,.04) 40%, transparent 70%);
+  filter:blur(2px);
+  animation:shimmer 6s var(--ease-water) infinite alternate;
+  pointer-events:none;
+}
+@keyframes shimmer {
+  from { transform:translateX(-50%) scale(1);   opacity:.6; }
+  to   { transform:translateX(-50%) scale(1.1); opacity:.9; }
+}
+
+.hero-inner { position:relative; z-index:4; max-width:1100px; }
+
+.hero-eyebrow {
+  font-family:var(--font-mono); font-size:.78rem; font-weight:500;
+  letter-spacing:.32em; text-transform:uppercase;
+  color:var(--electric);
+  display:inline-flex; align-items:center; gap:14px;
+  opacity:0; animation:fadeUp .9s var(--ease-water) .3s forwards;
+}
+.hero-eyebrow .diamond { color:var(--electric); font-size:.7em; }
+
+.hero-title {
+  font-family:var(--font-display); font-weight:300;
+  font-size:clamp(3.6rem, 11vw, 9rem);
+  line-height:1; letter-spacing:-.02em;
+  color:var(--silver-glow);
+  margin:32px 0 28px;
+  font-variation-settings:"opsz" 144, "SOFT" 50;
+  opacity:0; animation:fadeUp 1s var(--ease-water) .5s forwards;
+  text-wrap:balance;
+}
+.hero-title em {
+  font-style:italic; font-weight:300;
+  background:linear-gradient(100deg, var(--baby) 0%, var(--electric) 50%, var(--seafoam) 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+
+.hero-sub {
+  font-family:var(--font-display); font-style:italic; font-weight:300;
+  font-size:clamp(1.15rem,2.2vw,1.55rem);
+  line-height:1.5; color:var(--fg);
+  max-width:680px; margin:0 auto 44px;
+  opacity:0; animation:fadeUp 1s var(--ease-water) .8s forwards;
+}
+
+.pill-row {
+  display:flex; flex-wrap:wrap; gap:12px; justify-content:center;
+  margin-bottom:80px;
+  opacity:0; animation:fadeUp 1s var(--ease-water) 1.1s forwards;
+}
+.pill {
+  font-family:var(--font-mono); font-size:.72rem; font-weight:500;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--fg);
+  padding:10px 18px;
+  border-radius:var(--r-pill);
+  border:1px solid var(--rule);
+  background:var(--glass-bright);
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+  transition:transform var(--dur) var(--ease-water), border-color var(--dur) var(--ease-water), color var(--dur) var(--ease-water);
+}
+.pill:hover { transform:translateY(-2px); border-color:var(--electric); color:var(--bolt); }
+
+.scroll-cue {
+  display:flex; flex-direction:column; align-items:center; gap:14px;
+  opacity:0; animation:fadeUp 1s var(--ease-water) 1.5s forwards;
+}
+.scroll-cue .label {
+  font-family:var(--font-mono); font-size:.66rem; font-weight:500;
+  letter-spacing:.32em; text-transform:uppercase; color:var(--fg-muted);
+}
+.scroll-cue .line {
+  width:1px; height:60px; position:relative; overflow:hidden;
+  background:linear-gradient(180deg, transparent, var(--rule), transparent);
+}
+.scroll-cue .line::after {
+  content:""; position:absolute; left:0; right:0; height:30px;
+  background:linear-gradient(180deg, transparent, var(--electric), transparent);
+  animation:scrollPulse 2.4s var(--ease-water) infinite;
+}
+@keyframes scrollPulse {
+  from { top:-30px; opacity:0; }
+  10%  { opacity:1; }
+  90%  { opacity:1; }
+  to   { top:60px;  opacity:0; }
+}
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(28px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ============================================================
+   8.  REVEAL ON SCROLL
+============================================================ */
+.reveal { opacity:0; transform:translateY(28px); transition:opacity var(--dur-slow) var(--ease-water), transform var(--dur-slow) var(--ease-water); }
+.reveal.in-view { opacity:1; transform:translateY(0); }
+.reveal-stagger > * { opacity:0; transform:translateY(28px); transition:opacity var(--dur-slow) var(--ease-water), transform var(--dur-slow) var(--ease-water); }
+.reveal-stagger.in-view > *:nth-child(1) { transition-delay:.05s; opacity:1; transform:translateY(0); }
+.reveal-stagger.in-view > *:nth-child(2) { transition-delay:.18s; opacity:1; transform:translateY(0); }
+.reveal-stagger.in-view > *:nth-child(3) { transition-delay:.31s; opacity:1; transform:translateY(0); }
+.reveal-stagger.in-view > *:nth-child(4) { transition-delay:.44s; opacity:1; transform:translateY(0); }
+.reveal-stagger.in-view > *:nth-child(5) { transition-delay:.57s; opacity:1; transform:translateY(0); }
+.reveal-stagger.in-view > *:nth-child(6) { transition-delay:.70s; opacity:1; transform:translateY(0); }
+
+/* ============================================================
+   9.  SECTION BACKGROUNDS — intentionally empty.
+   The page-level color field is painted exclusively by .bg-base.
+   Every section is transparent so the unified gradient shows
+   through. DO NOT add per-section background here — that's the
+   bug this architecture is built to prevent (seams at boundaries).
+============================================================ */
+.contact { position:relative; overflow:hidden; }
+
+/* ============================================================
+   10. ABOUT — bio
+============================================================ */
+.bio p {
+  font-size:1.1rem; line-height:1.75; color:var(--fg);
+  margin-bottom:1.4em; max-width:60ch;
+}
+.bio p:first-child::first-letter {
+  font-family:var(--font-display); font-style:italic; font-weight:300;
+  font-size:5em; line-height:.85;
+  float:left; padding:8px 14px 0 0;
+  color:var(--electric);
+}
+
+/* ============================================================
+   11. PROJECT CARDS (Software section)
+   --------------------------------------------------------
+   *** Kevin: replace Card 3 (placeholder) when a third
+   project lands. Duplicate the .project-card pattern. ***
+============================================================ */
+.project-grid {
+  display:grid; gap:28px;
+  grid-template-columns:repeat(auto-fit, minmax(340px, 1fr));
+}
+.project-card {
+  position:relative;
+  background:var(--glass-bright);
+  border:1px solid var(--rule);
+  border-radius:var(--r-4);
+  padding:0 0 32px;
+  overflow:hidden;
+  transition:transform var(--dur) var(--ease-water), border-color var(--dur) var(--ease-water), box-shadow var(--dur) var(--ease-water);
+  display:flex; flex-direction:column;
+  box-shadow:0 30px 60px -30px rgba(0,0,0,.65);
+}
+.project-card::before {
+  content:""; position:absolute; left:24px; right:24px; top:0; height:1px;
+  background:linear-gradient(90deg, transparent, var(--electric), transparent);
+  opacity:0; transition:opacity var(--dur) var(--ease-water);
+}
+.project-card:hover {
+  transform:translateY(-6px);
+  border-color:var(--rule-bright);
+  box-shadow:0 40px 80px -30px rgba(0,0,0,.75), 0 0 0 1px var(--rule-bright);
+}
+.project-card:hover::before { opacity:1; }
+
+.card-visual {
+  height:200px;
+  border-bottom:1px solid var(--rule);
+  display:flex; align-items:center; justify-content:center;
+  position:relative; overflow:hidden;
+  /* No background fill — the unified base gradient shows through any
+     transparent edges of the project image. */
+}
+.card-visual .project-image {
+  width:100%; height:100%;
+  object-fit:cover;             /* crops to fixed-height card-visual band */
+  display:block;
+  cursor:zoom-in;
+  transition:transform 250ms ease-out, filter 250ms ease-out;
+}
+.card-visual .project-image:hover {
+  transform:scale(1.015);
+  filter:brightness(1.05);
+}
+
+.card-body { padding:26px 28px 0; display:flex; flex-direction:column; gap:14px; flex:1; }
+.card-index {
+  font-family:var(--font-mono); font-size:.7rem; font-weight:500;
+  letter-spacing:.32em; text-transform:uppercase; color:var(--fg-muted);
+}
+.card-title {
+  font-family:var(--font-display); font-weight:300;
+  font-size:1.85rem; line-height:1.1; letter-spacing:-.01em;
+  color:var(--fg-strong);
+}
+.card-stack {
+  font-family:var(--font-mono); font-size:.74rem; font-weight:500;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--electric);
+  display:flex; flex-wrap:wrap; gap:6px 14px;
+}
+.card-stack span { white-space:nowrap; }
+.card-prose { color:var(--fg-muted); font-size:.98rem; line-height:1.65; }
+.card-bullets { list-style:none; display:flex; flex-direction:column; gap:8px; }
+.card-bullets li {
+  font-size:.92rem; line-height:1.55; color:var(--fg);
+  padding-left:22px; position:relative;
+}
+.card-bullets li::before {
+  content:"⚡"; position:absolute; left:0; top:1px;
+  color:var(--electric); font-size:.85em;
+  text-shadow:0 0 8px rgba(93,217,245,.6);
+}
+.card-link {
+  margin-top:auto; padding:18px 28px 0;
+  display:inline-flex; align-items:center; gap:8px;
+  font-family:var(--font-mono); font-size:.74rem; font-weight:500;
+  letter-spacing:.18em; text-transform:uppercase; color:var(--electric);
+  align-self:flex-start;
+  transition:color var(--dur-fast) var(--ease-water);
+}
+.card-link .arrow { transition:transform var(--dur) var(--ease-water), margin-left var(--dur) var(--ease-water); display:inline-block; }
+.card-link:hover { color:var(--bolt); }
+.card-link:hover .arrow { transform:translateX(6px); margin-left:8px; }
+
+.project-card.placeholder {
+  border:1px dashed var(--rule);
+  background:rgba(238,244,250,.025);
+  align-items:center; justify-content:center;
+  text-align:center;
+  padding:64px 32px;
+  min-height:520px;
+  display:flex; flex-direction:column; gap:18px;
+}
+.project-card.placeholder .glyph {
+  font-family:var(--font-display); font-style:italic; font-weight:300;
+  font-size:4rem; line-height:1; color:var(--electric); opacity:.55;
+}
+.project-card.placeholder .ph-title {
+  font-family:var(--font-display); font-style:italic; font-weight:300;
+  font-size:1.6rem; color:var(--fg-strong);
+}
+.project-card.placeholder .ph-sub {
+  font-family:var(--font-display); font-style:italic; font-weight:300;
+  color:var(--fg-dim); font-size:1rem;
+}
+
+/* ============================================================
+   12. PCB CARDS (Hardware section)
+============================================================ */
+.pcb-grid {
+  display:grid; gap:32px;
+  grid-template-columns:1fr;     /* single Midnight Sun card spans full width */
+}
+.pcb-card {
+  background:var(--glass-bright);
+  border:1px solid var(--rule);
+  border-radius:var(--r-4);
+  overflow:hidden;
+  transition:transform var(--dur) var(--ease-water), border-color var(--dur) var(--ease-water);
+  display:flex; flex-direction:column;
+  box-shadow:0 30px 60px -30px rgba(0,0,0,.65);
+}
+.pcb-card:hover { transform:translateY(-6px); border-color:var(--rule-bright); }
+
+.pcb-visual {
+  border-bottom:1px solid var(--rule);
+  position:relative; overflow:hidden;
+  /* No background fill — image wrappers below are also transparent. */
+}
+/* Two PCB photos side-by-side on desktop, stacked on mobile.
+   Each lives in a thin rounded container with a hairline border. */
+.pcb-images-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  padding:20px;
+}
+@media (max-width:767px) {
+  .pcb-images-grid { grid-template-columns:1fr; }
+}
+.pcb-image-wrap {
+  display:flex; flex-direction:column; gap:10px;
+  padding:12px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:8px;
+  /* Transparent — base gradient shows through */
+}
+.pcb-image-wrap .project-image {
+  width:100%;
+  height:auto;
+  max-height:260px;
+  object-fit:contain;            /* preserve full PCB shape, no crop */
+  display:block;
+  border-radius:4px;
+  cursor:zoom-in;
+  transition:transform 250ms ease-out, filter 250ms ease-out;
+}
+.pcb-image-wrap .project-image:hover {
+  transform:scale(1.015);
+  filter:brightness(1.05);
+}
+.pcb-image-caption {
+  font-family:var(--font-mono); font-size:.66rem; font-weight:500;
+  letter-spacing:.18em; text-transform:uppercase; color:var(--fg-muted);
+  text-align:center;
+}
+
+.pcb-body { padding:32px 32px 36px; display:flex; flex-direction:column; gap:14px; }
+.pcb-meta {
+  font-family:var(--font-mono); font-size:.72rem; font-weight:500;
+  letter-spacing:.18em; text-transform:uppercase; color:var(--electric);
+}
+.pcb-prose { color:var(--fg-muted); line-height:1.65; }
+.pcb-tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+.pcb-tag {
+  font-family:var(--font-mono); font-size:.7rem; font-weight:500;
+  letter-spacing:.14em; text-transform:uppercase;
+  padding:6px 12px; border:1px solid var(--rule); border-radius:var(--r-pill);
+  color:var(--fg);
+  transition:transform var(--dur-fast) var(--ease-water), border-color var(--dur-fast) var(--ease-water), color var(--dur-fast) var(--ease-water);
+}
+.pcb-tag:hover { transform:translateY(-2px); border-color:var(--electric); color:var(--bolt); }
+
+/* Reduced motion: disable image hover transforms */
+@media (prefers-reduced-motion:reduce) {
+  .card-visual .project-image,
+  .pcb-image-wrap .project-image {
+    transition:none;
+  }
+  .card-visual .project-image:hover,
+  .pcb-image-wrap .project-image:hover {
+    transform:none; filter:none;
+  }
+}
+
+/* ============================================================
+   12a. LIGHTBOX — fullscreen image viewer.
+   Hidden by default; opened by clicking any .project-image.
+   Closes on backdrop click, on .lightbox-close click, or Escape.
+   No new dependencies — vanilla JS at end of body.
+============================================================ */
+.lightbox {
+  position:fixed; inset:0;
+  background:rgba(0,0,0,.85);
+  z-index:100;                   /* above .nav (50) */
+  display:none;
+  align-items:center; justify-content:center;
+  padding:5vh 5vw;
+  cursor:zoom-out;
+}
+.lightbox.is-open { display:flex; }
+.lightbox-content {
+  display:flex; flex-direction:column; align-items:center; gap:16px;
+  max-width:100%; max-height:100%;
+  cursor:default;
+}
+.lightbox-img {
+  max-width:100%;
+  max-height:80vh;
+  object-fit:contain;
+  border-radius:4px;
+  box-shadow:0 30px 80px rgba(0,0,0,.6);
+}
+.lightbox-caption {
+  font-family:var(--font-mono); font-size:.78rem; font-weight:500;
+  letter-spacing:.16em; text-transform:uppercase;
+  color:var(--paper);
+  text-align:center;
+}
+.lightbox-close {
+  position:absolute; top:18px; right:24px;
+  width:40px; height:40px;
+  display:flex; align-items:center; justify-content:center;
+  background:transparent;
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:50%;
+  color:var(--paper);
+  cursor:pointer;
+  font-size:1.5rem; line-height:1;
+  transition:border-color var(--dur-fast) var(--ease-water), color var(--dur-fast) var(--ease-water);
+}
+.lightbox-close:hover { border-color:var(--electric); color:var(--electric); }
+
+/* ============================================================
+   13. ACHIEVEMENTS — bright cards float on the unified dark base.
+   The section heading inherits the standard light-on-dark theme;
+   only the .ach-card surfaces are bright with dark text.
+============================================================ */
+.ach-grid {
+  display:grid; gap:24px;
+  grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+}
+.ach-card {
+  background:rgba(238,244,250,.92);
+  border:1px solid rgba(2,6,15,.08);
+  border-radius:var(--r-4);
+  padding:28px;
+  display:flex; flex-direction:column; gap:14px;
+  transition:transform var(--dur) var(--ease-water), box-shadow var(--dur) var(--ease-water);
+  box-shadow:0 20px 40px -20px rgba(2,6,15,.35);
+}
+.ach-card:hover {
+  transform:translateY(-6px);
+  box-shadow:0 30px 60px -20px rgba(2,6,15,.45);
+}
+.ach-badge {
+  display:inline-flex; align-items:center; gap:10px;
+  font-family:var(--font-mono); font-size:.7rem; font-weight:500;
+  letter-spacing:.22em; text-transform:uppercase;
+  color:var(--ocean);
+  align-self:flex-start;
+}
+.ach-badge .dot {
+  width:7px; height:7px; border-radius:50%;
+  background:var(--teal);
+  box-shadow:0 0 10px rgba(45,180,160,.7);
+}
+.ach-title {
+  font-family:var(--font-display); font-weight:400;
+  font-size:1.45rem; line-height:1.2; letter-spacing:-.01em;
+  color:var(--ink);
+}
+.ach-place {
+  font-family:var(--font-display); font-style:italic; font-weight:300;
+  font-size:1rem; color:var(--ocean);
+}
+.ach-prose { font-size:.92rem; line-height:1.6; color:rgba(2,6,15,.72); }
+
+/* ============================================================
+   14. SKILLS
+============================================================ */
+.skills-grid {
+  display:grid; gap:48px;
+  grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
+}
+.skill-group h3 {
+  font-family:var(--font-display); font-style:italic; font-weight:300;
+  font-size:1.5rem; color:var(--silver-glow);
+  display:inline-flex; align-items:center; gap:12px;
+  padding-bottom:14px; margin-bottom:18px;
+  border-bottom:1px solid var(--rule);
+  width:100%;
+}
+.skill-group h3 .dot {
+  width:8px; height:8px; border-radius:50%;
+  background:var(--electric);
+  box-shadow:0 0 12px rgba(93,217,245,.7);
+}
+.skill-chips { display:flex; flex-wrap:wrap; gap:8px; }
+.skill-chip {
+  font-family:var(--font-mono); font-size:.74rem; font-weight:500;
+  letter-spacing:.12em;
+  padding:8px 14px;
+  border:1px solid var(--rule);
+  border-radius:var(--r-pill);
+  color:var(--fg);
+  transition:transform var(--dur-fast) var(--ease-water), border-color var(--dur-fast) var(--ease-water), color var(--dur-fast) var(--ease-water);
+}
+.skill-chip:hover { transform:translateY(-2px); border-color:var(--electric); color:var(--bolt); }
+
+/* ============================================================
+   15. CONTACT
+============================================================ */
+.contact { text-align:center; }
+.contact::before {
+  content:""; position:absolute; left:50%; bottom:0;
+  width:120%; height:60%; transform:translateX(-50%);
+  background:radial-gradient(ellipse at 50% 100%, rgba(45,180,160,.22), transparent 60%);
+  pointer-events:none;
+}
+.contact-inner { position:relative; z-index:4; max-width:840px; margin:0 auto; }
+.contact-title {
+  font-family:var(--font-display); font-weight:300;
+  font-size:clamp(2.4rem, 6vw, 4.4rem); line-height:1.05;
+  letter-spacing:-.02em; color:var(--silver-glow);
+  margin:24px 0 28px; text-wrap:balance;
+}
+.contact-title em {
+  font-style:italic; font-weight:300;
+  background:linear-gradient(100deg, var(--baby) 0%, var(--electric) 50%, var(--seafoam) 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.contact-lead {
+  font-family:var(--font-display); font-style:italic; font-weight:300;
+  font-size:1.2rem; line-height:1.6; color:var(--fg);
+  max-width:560px; margin:0 auto 48px;
+}
+.contact-buttons { display:flex; flex-wrap:wrap; gap:14px; justify-content:center; margin-bottom:80px; }
+.contact-btn {
+  display:inline-flex; align-items:center; gap:10px;
+  padding:14px 24px;
+  font-family:var(--font-mono); font-size:.78rem; font-weight:500;
+  letter-spacing:.18em; text-transform:uppercase; color:var(--fg);
+  border:1px solid var(--rule); border-radius:var(--r-pill);
+  background:var(--glass-bright);
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+  transition:transform var(--dur) var(--ease-water), border-color var(--dur) var(--ease-water), color var(--dur) var(--ease-water);
+}
+.contact-btn:hover { transform:translateY(-3px); border-color:var(--electric); color:var(--bolt); }
+.contact-btn svg { width:18px; height:18px; }
+
+/* ============================================================
+   15a. RESUME — structured CV layout
+   Fully transparent — the unified .bg-base shows through.
+   No background, no backdrop-filter at section or subsection
+   level. Hairlines are low-opacity white. Two-column entry
+   grid (meta | content) on desktop, stacks on mobile.
+============================================================ */
+.resume .section-head { margin-bottom:48px; }
+
+.resume-pdf {
+  display:inline-flex; align-items:center; gap:10px;
+  padding:12px 22px;
+  font-family:var(--font-mono); font-size:.72rem; font-weight:500;
+  letter-spacing:.18em; text-transform:uppercase; color:var(--fg);
+  border:1px solid var(--rule); border-radius:var(--r-pill);
+  transition:transform var(--dur) var(--ease-water),
+             border-color var(--dur) var(--ease-water),
+             color var(--dur) var(--ease-water);
+}
+.resume-pdf:hover { transform:translateY(-2px); border-color:var(--electric); color:var(--bolt); }
+.resume-pdf svg { width:16px; height:16px; }
+
+/* Contact strip under the title */
+.resume-contact {
+  display:flex; flex-direction:column; gap:10px;
+  padding:22px 0;
+  border-top:1px solid rgba(255,255,255,.08);
+  border-bottom:1px solid rgba(255,255,255,.08);
+  margin-bottom:64px;
+}
+.rc-name {
+  font-family:var(--font-display); font-weight:300;
+  font-size:1.55rem; line-height:1.2; letter-spacing:-.01em;
+  color:var(--fg-strong);
+  margin:0;
+}
+.rc-list {
+  list-style:none;
+  display:flex; flex-wrap:wrap;
+  gap:6px 22px;
+  font-family:var(--font-mono); font-size:.74rem; font-weight:500;
+  letter-spacing:.14em;
+}
+.rc-list a {
+  color:var(--fg-muted); text-decoration:none;
+  transition:color var(--dur-fast) var(--ease-water);
+}
+.rc-list a:hover { color:var(--electric); }
+
+/* Categories */
+.resume-cat { margin-bottom:56px; }
+.resume-cat:last-child { margin-bottom:0; }
+.resume-cat-title {
+  font-family:var(--font-display); font-style:italic; font-weight:300;
+  font-size:1.55rem; line-height:1.2; color:var(--silver-glow);
+  padding-bottom:14px; margin:0 0 28px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  display:flex; align-items:center; gap:14px;
+}
+.resume-cat-title::before {
+  content:""; width:8px; height:8px; border-radius:50%;
+  background:var(--electric);
+  box-shadow:0 0 12px rgba(93,217,245,.6);
+  flex-shrink:0;
+}
+
+/* Entries — two-column grid: meta on left, content on right */
+.resume-entry {
+  display:grid;
+  grid-template-columns:minmax(220px, 280px) 1fr;
+  gap:24px 48px;
+  padding:24px 0;
+}
+.resume-entry + .resume-entry { border-top:1px solid rgba(255,255,255,.08); }
+.resume-entry:first-of-type { padding-top:0; }
+.resume-entry:last-of-type { padding-bottom:0; }
+
+.resume-meta { display:flex; flex-direction:column; gap:18px; }
+.rm-primary   { display:flex; flex-direction:column; gap:2px; }
+.rm-secondary { display:flex; flex-direction:column; gap:4px; }
+
+.resume-entry-title {
+  font-family:var(--font-display); font-weight:400;
+  font-size:1.2rem; line-height:1.25; letter-spacing:-.005em;
+  color:var(--fg-strong);
+  margin:0;
+}
+.resume-entry-org {
+  font-family:var(--font-body); font-weight:400;
+  font-size:.95rem; line-height:1.4; color:var(--fg);
+  margin:0;
+}
+.resume-entry-when {
+  font-family:var(--font-mono); font-size:.7rem; font-weight:500;
+  letter-spacing:.16em; text-transform:uppercase;
+  color:var(--electric);
+  margin:0;
+}
+.resume-entry-where {
+  font-family:var(--font-mono); font-size:.7rem; font-weight:500;
+  letter-spacing:.16em; text-transform:uppercase;
+  color:var(--fg-muted);
+  margin:0;
+}
+
+/* Inline variant for entries with no bullet content (e.g. Education):
+   meta becomes a horizontal newspaper-style row. */
+.resume-entry--inline {
+  grid-template-columns:1fr auto;
+  align-items:baseline;
+  gap:12px 32px;
+}
+.resume-entry--inline .rm-secondary { text-align:right; gap:4px; }
+
+/* Bullets */
+.resume-bullets {
+  list-style:none; margin:0;
+  display:flex; flex-direction:column; gap:10px;
+}
+.resume-bullets li {
+  position:relative;
+  padding-left:24px;
+  font-size:.95rem; line-height:1.6;
+  color:var(--fg);
+}
+.resume-bullets li::before {
+  content:""; position:absolute;
+  left:0; top:.7em;
+  width:12px; height:1px;
+  background:var(--electric);
+  box-shadow:0 0 6px rgba(93,217,245,.55);
+}
+
+/* Tech-stack tags on Project entries */
+.resume-tech {
+  display:flex; flex-wrap:wrap; gap:6px 8px;
+  margin-bottom:14px;
+}
+.resume-tech-tag {
+  font-family:var(--font-mono); font-size:.66rem; font-weight:500;
+  letter-spacing:.12em; text-transform:uppercase;
+  padding:4px 10px;
+  border:1px solid var(--rule); border-radius:var(--r-pill);
+  color:var(--fg-muted);
+}
+
+/* Technical Skills — same meta+content grid, content is chips */
+.resume-skills { display:flex; flex-direction:column; gap:24px; }
+.resume-skill-group {
+  display:grid;
+  grid-template-columns:minmax(220px, 280px) 1fr;
+  gap:14px 48px;
+  align-items:start;
+}
+.resume-skill-label {
+  font-family:var(--font-mono); font-size:.74rem; font-weight:500;
+  letter-spacing:.22em; text-transform:uppercase;
+  color:var(--electric);
+  padding-top:6px;
+  margin:0;
+}
+.resume-chips { display:flex; flex-wrap:wrap; gap:8px; }
+.resume-chip {
+  font-family:var(--font-mono); font-size:.72rem; font-weight:500;
+  letter-spacing:.12em;
+  padding:7px 13px;
+  border:1px solid var(--rule); border-radius:var(--r-pill);
+  color:var(--fg);
+  transition:transform var(--dur-fast) var(--ease-water),
+             border-color var(--dur-fast) var(--ease-water),
+             color var(--dur-fast) var(--ease-water);
+}
+.resume-chip:hover { transform:translateY(-2px); border-color:var(--electric); color:var(--bolt); }
+
+/* Mobile collapse — single column, left-aligned meta */
+@media (max-width:880px) {
+  .resume-entry,
+  .resume-entry--inline,
+  .resume-skill-group {
+    grid-template-columns:1fr;
+    gap:14px;
+  }
+  .resume-entry--inline .rm-secondary { text-align:left; }
+  .resume-skill-label { padding-top:0; }
+}
+
+/* ============================================================
+   16. FOOTER
+============================================================ */
+.footer { padding:32px var(--gutter) 48px; position:relative; z-index:4; }
+.footer-rule { height:1px; background:var(--rule); margin-bottom:24px; }
+.footer-row {
+  display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;
+  font-family:var(--font-mono); font-size:.7rem; font-weight:500;
+  letter-spacing:.22em; text-transform:uppercase; color:var(--fg-muted);
+}
+
+/* ============================================================
+   17. KOI — line-art koi PNG orbiting the About section.
+   Outer element: circular orbit via offset-path (linear, 16s).
+   Inner element: subtle vertical bob + rotation wobble (3s ease).
+   Container is 0×0 at the orbit center; orbit element is sized
+   to the koi and shifted up/left by half its dimensions so its
+   center sits on the pivot. The koi's natural pose has its head
+   pointing roughly NE in the source image, so offset-rotate gets
+   a +45° offset to make the head lead the path tangent.
+   No layout impact — position:absolute, pointer-events:none.
+============================================================ */
+.about { overflow:visible; }
+
+.about-fish-container {
+  position:absolute;
+  /* Track the wrap's centered position so the gap from bio text to
+     orbit stays constant across viewport widths. The wrap is
+     max-width:1240px centered; on viewports wider than 1240 it picks
+     up margin = (viewport - 1240) / 2 on each side. We add that
+     margin (clamped to 0 below 1240) + gutter padding + 990px to
+     land the orbit center ~410px past the bio's 60ch right edge.
+     Visual koi clearance at the orbit's leftmost extreme stays at
+     ~220px+. The koi sits at the wrap's right edge area — visible
+     extent grazes into the right gutter on narrower desktops, but
+     stays well inside the viewport (no scroll). Verified 1280/1440/1920. */
+  left:calc(max(0px, (100% - 1240px) / 2) + var(--gutter) + 990px);
+  top:50%;
+  width:0; height:0;
+  pointer-events:none;
+}
+
+.about-fish-orbit {
+  position:absolute;
+  width:180px; height:240px;       /* matches PNG aspect 242×324 ≈ 0.747 */
+  top:-120px; left:-90px;          /* center element on the 0×0 pivot */
+  offset-path:circle(80px at center);
+  offset-rotate:auto 45deg;        /* compensate for koi's NE-facing pose */
+  animation:koiOrbit 16s linear infinite;
+  will-change:transform, offset-distance;
+}
+@keyframes koiOrbit {
+  from { offset-distance:0%; }
+  to   { offset-distance:100%; }
+}
+
+/* Inner bob: child transform that composes on top of the orbit */
+.about-fish-bob {
+  display:block;
+  width:100%; height:100%;
+  object-fit:contain;
+  transform-origin:center;
+  filter:drop-shadow(0 2px 8px rgba(0,0,0,.35));
+  animation:koiBob 3s ease-in-out infinite alternate;
+  will-change:transform;
+}
+@keyframes koiBob {
+  from { transform:translateY(-4px) rotate(-3deg); }
+  to   { transform:translateY(4px)  rotate(3deg); }
+}
+
+/* Below 1024px the follow-text formula crowds the right edge.
+   Switch to right-anchoring with breathing room. */
+@media (max-width:1023px) {
+  .about-fish-container {
+    left:auto;
+    right:clamp(80px, 10vw, 140px);
+  }
+}
+/* Tablet 768-1023px: shrink koi AND orbit radius so it fits on the
+   narrower right-side strip without overlapping the bio text. */
+@media (min-width:768px) and (max-width:1023px) {
+  .about-fish-orbit {
+    width:90px; height:120px;       /* 50% scale */
+    top:-60px; left:-45px;
+    offset-path:circle(25px at center); /* tighter orbit for narrow space */
+  }
+}
+/* Mobile: hide entirely */
+@media (max-width:767px) {
+  .about-fish-container { display:none; }
+}
+/* Reduced motion: park on the circle, freeze the bob */
+@media (prefers-reduced-motion:reduce) {
+  .about-fish-orbit {
+    animation:none;
+    offset-distance:75%;     /* parked at the top of the circle */
+  }
+  .about-fish-bob { animation:none; }
+}
+
+/* ============================================================
+   18. RESPONSIVE — single breakpoint at 880px
+============================================================ */
+@media (max-width:880px) {
+  .nav-row { padding:14px var(--gutter); }
+  .nav-links { display:none; }
+  .pcb-grid { grid-template-columns:1fr; }
+  .head-row { flex-direction:column; align-items:flex-start; }
+  .head-row .section-tagline { text-align:left; }
+}
+
+/* ============================================================
+   18. REDUCED MOTION
+============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration:1ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:1ms !important;
+    scroll-behavior:auto !important;
+  }
+  .scroll-cue .line::after { display:none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     UNIFIED BACKGROUND — the single source of the page color
+     field. .bg-base paints the continuous OKLCH gradient,
+     .bg-noise dithers it against 8-bit banding, .bg-overlay
+     adds ambient animated highlights via mix-blend-mode.
+     These three are the ONLY page-level color paint. Every
+     section below must stay transparent.
+============================================================ -->
+<div class="bg-base"    aria-hidden="true"></div>
+<div class="bg-noise"   aria-hidden="true"></div>
+<div class="bg-overlay" aria-hidden="true"></div>
+
+<!-- ============================================================
+     ATMOSPHERE — bubbles + sparks (fixed, pointer-events none)
+============================================================ -->
+<div class="atmosphere" aria-hidden="true">
+  <!-- 12 bubbles, sized + offset + animated via inline style -->
+  <div class="bubble" style="left:6%; width:14px; height:14px; --drift:30px; animation-duration:24s; animation-delay:-2s;"></div>
+  <div class="bubble" style="left:14%; width:8px; height:8px; --drift:-22px; animation-duration:18s; animation-delay:-9s;"></div>
+  <div class="bubble" style="left:22%; width:22px; height:22px; --drift:48px; animation-duration:32s; animation-delay:-14s;"></div>
+  <div class="bubble" style="left:31%; width:10px; height:10px; --drift:-36px; animation-duration:21s; animation-delay:-5s;"></div>
+  <div class="bubble" style="left:42%; width:6px; height:6px; --drift:18px; animation-duration:16s; animation-delay:-12s;"></div>
+  <div class="bubble" style="left:51%; width:18px; height:18px; --drift:-28px; animation-duration:28s; animation-delay:-3s;"></div>
+  <div class="bubble" style="left:62%; width:11px; height:11px; --drift:34px; animation-duration:22s; animation-delay:-18s;"></div>
+  <div class="bubble" style="left:70%; width:7px; height:7px; --drift:-20px; animation-duration:19s; animation-delay:-7s;"></div>
+  <div class="bubble" style="left:79%; width:24px; height:24px; --drift:42px; animation-duration:34s; animation-delay:-22s;"></div>
+  <div class="bubble" style="left:86%; width:9px; height:9px; --drift:-30px; animation-duration:20s; animation-delay:-1s;"></div>
+  <div class="bubble" style="left:92%; width:13px; height:13px; --drift:26px; animation-duration:26s; animation-delay:-15s;"></div>
+  <div class="bubble" style="left:97%; width:5px; height:5px; --drift:-14px; animation-duration:17s; animation-delay:-10s;"></div>
+
+  <!-- 6 sparks, staggered so one fires every ~1–2s -->
+  <div class="spark" style="left:18%; top:22%;  animation-delay:0s;"></div>
+  <div class="spark" style="left:74%; top:18%;  animation-delay:1.4s;"></div>
+  <div class="spark" style="left:36%; top:58%;  animation-delay:2.8s;"></div>
+  <div class="spark" style="left:88%; top:46%;  animation-delay:4.0s;"></div>
+  <div class="spark" style="left:12%; top:78%;  animation-delay:5.2s;"></div>
+  <div class="spark" style="left:62%; top:88%;  animation-delay:6.4s;"></div>
+</div>
+
+<!-- ============================================================
+     NAV
+============================================================ -->
+<nav class="nav" aria-label="Primary">
+  <div class="nav-row">
+    <a href="#top" class="brand">Kev<span class="dot">i</span>n Ge</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#software">Software</a></li>
+      <li><a href="#hardware">Hardware</a></li>
+      <li><a href="#achievements">Achievements</a></li>
+      <li><a href="#resume">Resume</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ============================================================
+     HERO
+============================================================ -->
+<header id="top" class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">
+      <span class="diamond">◆</span>
+      Electrical Engineering · University of Waterloo
+      <span class="diamond">◆</span>
+    </div>
+
+    <h1 class="hero-title">Lingfeng <em>Kevin</em> Ge</h1>
+
+    <p class="hero-sub">Power systems, controls, and the things that hum between them.</p>
+
+    <div class="pill-row">
+      <span class="pill">S&amp;C Electric · Co-op</span>
+      <span class="pill">Midnight Sun Solar Car</span>
+      <span class="pill">Calgary ⇄ Waterloo</span>
+    </div>
+
+    <div class="scroll-cue">
+      <span class="label">Scroll</span>
+      <div class="line"></div>
+    </div>
+  </div>
+</header>
+
+<!-- WAVE DIVIDER 1 : decorative SVG art over unified .bg-base. gentle long swells; silver foam back, navy mid, abyss silhouette front. -->
+<div class="wave-divider" aria-hidden="true">
+  <svg viewBox="0 0 2400 240" preserveAspectRatio="none">
+    <defs>
+      <linearGradient id="d1w1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#cad4e0" stop-opacity="0"/><stop offset="25%" stop-color="#cad4e0" stop-opacity="0.4"/><stop offset="50%" stop-color="#cad4e0" stop-opacity="1"/><stop offset="75%" stop-color="#cad4e0" stop-opacity="0.4"/><stop offset="100%" stop-color="#cad4e0" stop-opacity="0"/></linearGradient>
+      <linearGradient id="d1w2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0f2348" stop-opacity="0"/><stop offset="25%" stop-color="#0f2348" stop-opacity="0.4"/><stop offset="50%" stop-color="#0f2348" stop-opacity="1"/><stop offset="75%" stop-color="#0f2348" stop-opacity="0.4"/><stop offset="100%" stop-color="#0f2348" stop-opacity="0"/></linearGradient>
+      <linearGradient id="d1w3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#02060f" stop-opacity="0"/><stop offset="25%" stop-color="#02060f" stop-opacity="0.4"/><stop offset="50%" stop-color="#02060f" stop-opacity="1"/><stop offset="75%" stop-color="#02060f" stop-opacity="0.4"/><stop offset="100%" stop-color="#02060f" stop-opacity="0"/></linearGradient>
+    </defs>
+    <path class="w1" d="M0,96 C400,74 800,74 1200,96 C1600,118 2000,118 2400,96 L2400,118 L0,118 Z M2400,96 C2800,74 3200,74 3600,96 C4000,118 4400,118 4800,96 L4800,118 L2400,118 Z" fill="url(#d1w1)"></path>
+    <path class="w2" d="M0,132 C400,104 800,104 1200,132 C1600,160 2000,160 2400,132 L2400,160 L0,160 Z M2400,132 C2800,104 3200,104 3600,132 C4000,160 4400,160 4800,132 L4800,160 L2400,160 Z" fill="url(#d1w2)"></path>
+    <path class="w3" d="M0,168 C400,133 800,133 1200,168 C1600,203 2000,203 2400,168 L2400,203 L0,203 Z M2400,168 C2800,133 3200,133 3600,168 C4000,203 4400,203 4800,168 L4800,203 L2400,203 Z" fill="url(#d1w3)"></path>
+  </svg>
+</div>
+
+<!-- ============================================================
+     SECTION 01 — ABOUT
+============================================================ -->
+<section id="about" class="about section-pad">
+  <!-- Koi: orbits past the bio text on desktop, scales 70% on tablet,
+       hidden below 768px. PNG asset, transparent background. -->
+  <div class="about-fish-container" aria-hidden="true">
+    <div class="about-fish-orbit">
+      <img class="about-fish-bob"
+           src="koi-removebg-preview.png"
+           alt=""
+           aria-hidden="true"
+           draggable="false"
+           decoding="async">
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-no">01 / At Anchor</span>
+      <h2 class="section-title">About</h2>
+    </div>
+
+    <div class="bio reveal">
+      <p>An Electrical Engineering student at the University of Waterloo currently designing high-voltage switchgear systems at S&amp;C Electric — automating CAD workflows in Zuken E3 with C# and VBA, drafting single-line and three-line schematics, and modernizing legacy tooling.</p>
+      <p>Drawn to the physical end of the field: power systems, controls, applications engineering. The kind of work where the diagram on the screen connects to copper that carries real current.</p>
+      <p>Outside of EE: a piano teacher in Calgary, hardware design contributor on the Midnight Sun Solar Rayce Car team, and a lifelong builder who keeps a small shop of personal projects running in parallel with school.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WAVE DIVIDER 2 : decorative SVG art over unified .bg-base. choppy crests; teal mist back, ocean mid, midnight silhouette front. -->
+<div class="wave-divider" aria-hidden="true">
+  <svg viewBox="0 0 2400 240" preserveAspectRatio="none">
+    <defs>
+      <linearGradient id="d2w1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2db4a0" stop-opacity="0"/><stop offset="25%" stop-color="#2db4a0" stop-opacity="0.4"/><stop offset="50%" stop-color="#2db4a0" stop-opacity="1"/><stop offset="75%" stop-color="#2db4a0" stop-opacity="0.4"/><stop offset="100%" stop-color="#2db4a0" stop-opacity="0"/></linearGradient>
+      <linearGradient id="d2w2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a3a6b" stop-opacity="0"/><stop offset="25%" stop-color="#1a3a6b" stop-opacity="0.4"/><stop offset="50%" stop-color="#1a3a6b" stop-opacity="1"/><stop offset="75%" stop-color="#1a3a6b" stop-opacity="0.4"/><stop offset="100%" stop-color="#1a3a6b" stop-opacity="0"/></linearGradient>
+      <linearGradient id="d2w3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#060d1f" stop-opacity="0"/><stop offset="25%" stop-color="#060d1f" stop-opacity="0.4"/><stop offset="50%" stop-color="#060d1f" stop-opacity="1"/><stop offset="75%" stop-color="#060d1f" stop-opacity="0.4"/><stop offset="100%" stop-color="#060d1f" stop-opacity="0"/></linearGradient>
+    </defs>
+    <path class="w1" d="M0,96 C300,72 900,72 1200,96 C1500,120 2100,120 2400,96 L2400,120 L0,120 Z M2400,96 C2700,72 3300,72 3600,96 C3900,120 4500,120 4800,96 L4800,120 L2400,120 Z" fill="url(#d2w1)"></path>
+    <path class="w2" d="M0,132 C300,102 900,102 1200,132 C1500,162 2100,162 2400,132 L2400,162 L0,162 Z M2400,132 C2700,102 3300,102 3600,132 C3900,162 4500,162 4800,132 L4800,162 L2400,162 Z" fill="url(#d2w2)"></path>
+    <path class="w3" d="M0,168 C300,132 900,132 1200,168 C1500,204 2100,204 2400,168 L2400,204 L0,204 Z M2400,168 C2700,132 3300,132 3600,168 C3900,204 4500,204 4800,168 L4800,204 L2400,204 Z" fill="url(#d2w3)"></path>
+  </svg>
+</div>
+
+<!-- ============================================================
+     SECTION 02 — SOFTWARE
+     *** Card 3 is a placeholder — replace when next project lands ***
+============================================================ -->
+<section id="software" class="software section-pad">
+  <div class="wrap">
+    <div class="section-head head-row reveal">
+      <div>
+        <span class="section-no">02 / Currents in Code</span>
+        <h2 class="section-title">Software</h2>
+      </div>
+      <p class="section-tagline">Browser-native tools for the kind of problems that usually demand a six-week training course.</p>
+    </div>
+
+    <div class="project-grid reveal-stagger">
+
+      <!-- PROJECT 01 — ATSimulator -->
+      <article class="project-card">
+        <div class="card-visual">
+          <img class="project-image"
+               src="projects/atsimulator.png"
+               alt="Screenshot of the ATS Simulator interface showing circuit topology and event log"
+               width="2559" height="1328"
+               loading="lazy" decoding="async"
+               data-caption="ATSimulator">
+        </div>
+        <div class="card-body">
+          <span class="card-index">Project 01</span>
+          <h3 class="card-title">ATSimulator</h3>
+          <div class="card-stack"><span>React</span><span>·</span><span>TypeScript</span><span>·</span><span>Power Systems</span></div>
+          <p class="card-prose">A browser-based Automatic Transfer Switch simulator with a CAD-style topology editor. Build any switchgear scheme — Two-Source, Main-Tie-Main, Main-Main-Main, or fully custom — and watch open transition, closed transition with sync-check, and fast transfer events execute in real time.</p>
+          <ul class="card-bullets">
+            <li>Graph-based connectivity engine using BFS flood-fill energization</li>
+            <li>Snap-to-grid editor with port-aware rotation and orthogonal wire routing</li>
+            <li>Variable simulation speed from 0.05× to 5× with timestamped event logging</li>
+            <li>ANSI device-function logic (27, 59, 81, 25, 86) and configurable timers</li>
+          </ul>
+        </div>
+        <a class="card-link" href="https://github.com/Kev868/ATS-Simulator" target="_blank" rel="noopener">View on GitHub <span class="arrow">→</span></a>
+      </article>
+
+      <!-- PROJECT 02 — HomePOD -->
+      <article class="project-card">
+        <div class="card-visual">
+          <img class="project-image"
+               src="projects/homepod.png"
+               alt="Custom-built smart home hub displaying temperature, weather, and task widgets"
+               width="2880" height="2160"
+               loading="lazy" decoding="async"
+               data-caption="Custom HomePOD device">
+        </div>
+        <div class="card-body">
+          <span class="card-index">Project 02</span>
+          <h3 class="card-title">HomePOD</h3>
+          <div class="card-stack"><span>Arduino</span><span>·</span><span>C</span><span>·</span><span>Python</span><span>·</span><span>Soldering</span></div>
+          <p class="card-prose">A custom voice-controlled smart home device. Recognizes spoken commands and drives household functions — temperature regulation, environmental sensing, scheduled tasks — over a hand-soldered control board with custom CAD schematics.</p>
+          <ul class="card-bullets">
+            <li>Voice command pipeline with sensor integration and power regulation</li>
+            <li>Hand-soldered prototype with AutoCAD Electrical schematic documentation</li>
+            <li>Cross-disciplinary build: hardware, firmware, and software co-developed</li>
+            <li>Modular design for replication and future feature expansion</li>
+          </ul>
+        </div>
+        <a class="card-link" href="https://github.com/Kev868/HomePOD" target="_blank" rel="noopener">View on GitHub <span class="arrow">→</span></a>
+      </article>
+
+      <!-- PROJECT 03 — PLACEHOLDER (replace when next project lands) -->
+      <article class="project-card placeholder">
+        <div class="glyph">+</div>
+        <div class="ph-title">Future Project</div>
+        <div class="ph-sub">More currents on the way</div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- WAVE DIVIDER 3 : decorative SVG art over unified .bg-base. sharper crests; silver-glow back, deep-blue mid, midnight silhouette front. -->
+<div class="wave-divider" aria-hidden="true">
+  <svg viewBox="0 0 2400 240" preserveAspectRatio="none">
+    <defs>
+      <linearGradient id="d3w1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e4ecf5" stop-opacity="0"/><stop offset="25%" stop-color="#e4ecf5" stop-opacity="0.4"/><stop offset="50%" stop-color="#e4ecf5" stop-opacity="1"/><stop offset="75%" stop-color="#e4ecf5" stop-opacity="0.4"/><stop offset="100%" stop-color="#e4ecf5" stop-opacity="0"/></linearGradient>
+      <linearGradient id="d3w2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2563ac" stop-opacity="0"/><stop offset="25%" stop-color="#2563ac" stop-opacity="0.4"/><stop offset="50%" stop-color="#2563ac" stop-opacity="1"/><stop offset="75%" stop-color="#2563ac" stop-opacity="0.4"/><stop offset="100%" stop-color="#2563ac" stop-opacity="0"/></linearGradient>
+      <linearGradient id="d3w3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#060d1f" stop-opacity="0"/><stop offset="25%" stop-color="#060d1f" stop-opacity="0.4"/><stop offset="50%" stop-color="#060d1f" stop-opacity="1"/><stop offset="75%" stop-color="#060d1f" stop-opacity="0.4"/><stop offset="100%" stop-color="#060d1f" stop-opacity="0"/></linearGradient>
+    </defs>
+    <path class="w1" d="M0,96 C350,70 850,70 1200,96 C1550,122 2050,122 2400,96 L2400,122 L0,122 Z M2400,96 C2750,70 3250,70 3600,96 C3950,122 4450,122 4800,96 L4800,122 L2400,122 Z" fill="url(#d3w1)"></path>
+    <path class="w2" d="M0,132 C350,100 850,100 1200,132 C1550,164 2050,164 2400,132 L2400,164 L0,164 Z M2400,132 C2750,100 3250,100 3600,132 C3950,164 4450,164 4800,132 L4800,164 L2400,164 Z" fill="url(#d3w2)"></path>
+    <path class="w3" d="M0,168 C350,130 850,130 1200,168 C1550,206 2050,206 2400,168 L2400,206 L0,206 Z M2400,168 C2750,130 3250,130 3600,168 C3950,206 4450,206 4800,168 L4800,206 L2400,206 Z" fill="url(#d3w3)"></path>
+  </svg>
+</div>
+
+<!-- ============================================================
+     SECTION 03 — HARDWARE & PCB
+     *** Board 02 is a placeholder — swap when next board routed ***
+============================================================ -->
+<section id="hardware" class="hardware section-pad">
+  <div class="wrap">
+    <div class="section-head head-row reveal">
+      <div>
+        <span class="section-no">03 / Beneath the Surface</span>
+        <h2 class="section-title">Hardware &amp; <em>PCB</em></h2>
+      </div>
+      <p class="section-tagline">Where the schematic stops being a diagram and starts being a board.</p>
+    </div>
+
+    <div class="pcb-grid reveal-stagger">
+
+      <!-- Midnight Sun Solar Rayce Car — two PCB designs side-by-side -->
+      <article class="pcb-card">
+        <div class="pcb-visual">
+          <div class="pcb-images-grid">
+            <figure class="pcb-image-wrap">
+              <img class="project-image"
+                   src="projects/pcb-board-1.png"
+                   alt="First PCB design for the Midnight Sun solar vehicle project"
+                   width="832" height="583"
+                   loading="lazy" decoding="async"
+                   data-caption="First PCB design — Midnight Sun Solar Rayce Car">
+              <figcaption class="pcb-image-caption">First PCB design</figcaption>
+            </figure>
+            <figure class="pcb-image-wrap">
+              <img class="project-image"
+                   src="projects/pcb-board-2.png"
+                   alt="Second PCB design for the Midnight Sun solar vehicle project"
+                   width="1500" height="708"
+                   loading="lazy" decoding="async"
+                   data-caption="Second PCB design — Midnight Sun Solar Rayce Car">
+              <figcaption class="pcb-image-caption">Second PCB design</figcaption>
+            </figure>
+          </div>
+        </div>
+        <div class="pcb-body">
+          <span class="card-index">Midnight Sun</span>
+          <h3 class="card-title">Solar Rayce Car</h3>
+          <p class="pcb-meta">2-Layer · Altium · Solar Rayce Team · 2025–Present</p>
+          <p class="pcb-prose">Designed and simulated 2-layer PCBs for the Waterloo Midnight Sun Solar Rayce Car team — schematic integration, optimized component placement, custom libraries, and DRCs. Circuit-efficiency, power-calculation, and manufacturability considerations carried through to documented technical reports for future iterations.</p>
+          <div class="pcb-tags">
+            <span class="pcb-tag">Altium</span>
+            <span class="pcb-tag">Schematic Capture</span>
+            <span class="pcb-tag">DRC</span>
+            <span class="pcb-tag">Power Calc</span>
+            <span class="pcb-tag">Custom Libraries</span>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- WAVE DIVIDER 4 : decorative SVG art over unified .bg-base. long swells; baby-blue back, ocean mid, navy deep-water silhouette front. -->
+<div class="wave-divider" aria-hidden="true">
+  <svg viewBox="0 0 2400 240" preserveAspectRatio="none">
+    <defs>
+      <linearGradient id="d4w1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#b8d9f0" stop-opacity="0"/><stop offset="25%" stop-color="#b8d9f0" stop-opacity="0.4"/><stop offset="50%" stop-color="#b8d9f0" stop-opacity="1"/><stop offset="75%" stop-color="#b8d9f0" stop-opacity="0.4"/><stop offset="100%" stop-color="#b8d9f0" stop-opacity="0"/></linearGradient>
+      <linearGradient id="d4w2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a3a6b" stop-opacity="0"/><stop offset="25%" stop-color="#1a3a6b" stop-opacity="0.4"/><stop offset="50%" stop-color="#1a3a6b" stop-opacity="1"/><stop offset="75%" stop-color="#1a3a6b" stop-opacity="0.4"/><stop offset="100%" stop-color="#1a3a6b" stop-opacity="0"/></linearGradient>
+      <linearGradient id="d4w3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0f2348" stop-opacity="0"/><stop offset="25%" stop-color="#0f2348" stop-opacity="0.4"/><stop offset="50%" stop-color="#0f2348" stop-opacity="1"/><stop offset="75%" stop-color="#0f2348" stop-opacity="0.4"/><stop offset="100%" stop-color="#0f2348" stop-opacity="0"/></linearGradient>
+    </defs>
+    <path class="w1" d="M0,96 C500,74 700,74 1200,96 C1700,118 1900,118 2400,96 L2400,118 L0,118 Z M2400,96 C2900,74 3100,74 3600,96 C4100,118 4300,118 4800,96 L4800,118 L2400,118 Z" fill="url(#d4w1)"></path>
+    <path class="w2" d="M0,132 C500,104 700,104 1200,132 C1700,160 1900,160 2400,132 L2400,160 L0,160 Z M2400,132 C2900,104 3100,104 3600,132 C4100,160 4300,160 4800,132 L4800,160 L2400,160 Z" fill="url(#d4w2)"></path>
+    <path class="w3" d="M0,168 C500,134 700,134 1200,168 C1700,202 1900,202 2400,168 L2400,202 L0,202 Z M2400,168 C2900,134 3100,134 3600,168 C4100,202 4300,202 4800,168 L4800,202 L2400,202 Z" fill="url(#d4w3)"></path>
+  </svg>
+</div>
+
+<!-- ============================================================
+     SECTION 04 — ACHIEVEMENTS  (BRIGHT — dark text on bright water)
+     *** Add cards by duplicating .ach-card pattern below ***
+============================================================ -->
+<section id="achievements" class="achievements section-pad">
+  <div class="wrap">
+    <div class="section-head head-row reveal">
+      <div>
+        <span class="section-no">04 / Surfacing</span>
+        <h2 class="section-title">Achievements</h2>
+      </div>
+    </div>
+
+    <div class="ach-grid reveal-stagger">
+
+      <article class="ach-card">
+        <span class="ach-badge"><span class="dot"></span> S&amp;C Electric · Co-op</span>
+        <h3 class="ach-title">Design Engineer</h3>
+        <p class="ach-place">Toronto, ON · Jan 2026 – Apr 2026</p>
+        <p class="ach-prose">Building automation tooling for HV switchgear schematic generation in Zuken E3 — VBA, VBS, C#, HTML — alongside Microstation drafting work for custom electrical components.</p>
+      </article>
+
+      <article class="ach-card">
+        <span class="ach-badge"><span class="dot"></span> Solar Car · Hardware</span>
+        <h3 class="ach-title">Hardware Design Team Member</h3>
+        <p class="ach-place">University of Waterloo Midnight Sun Solar Rayce</p>
+        <p class="ach-prose">Designed and simulated 2-layer PCBs for Waterloo's Midnight Sun Solar Rayce Car team — schematic integration, optimized component placement, custom libraries, and DRCs to ensure compliance with safety and manufacturing standards.</p>
+      </article>
+
+      <article class="ach-card">
+        <span class="ach-badge"><span class="dot"></span> RS Music · Piano Teacher</span>
+        <h3 class="ach-title">Instructor</h3>
+        <p class="ach-place">Calgary, AB · Dec. 2023 – Present</p>
+        <p class="ach-prose">Personalized instruction across all ages and skill levels, with adaptive lesson plans and long-term progression strategy.</p>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- WAVE DIVIDER 5 : decorative SVG art over unified .bg-base. short choppy; sky back, ocean mid, navy deep-water silhouette front. -->
+<div class="wave-divider" aria-hidden="true">
+  <svg viewBox="0 0 2400 240" preserveAspectRatio="none">
+    <defs>
+      <linearGradient id="d5w1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7ab8e8" stop-opacity="0"/><stop offset="25%" stop-color="#7ab8e8" stop-opacity="0.4"/><stop offset="50%" stop-color="#7ab8e8" stop-opacity="1"/><stop offset="75%" stop-color="#7ab8e8" stop-opacity="0.4"/><stop offset="100%" stop-color="#7ab8e8" stop-opacity="0"/></linearGradient>
+      <linearGradient id="d5w2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a3a6b" stop-opacity="0"/><stop offset="25%" stop-color="#1a3a6b" stop-opacity="0.4"/><stop offset="50%" stop-color="#1a3a6b" stop-opacity="1"/><stop offset="75%" stop-color="#1a3a6b" stop-opacity="0.4"/><stop offset="100%" stop-color="#1a3a6b" stop-opacity="0"/></linearGradient>
+      <linearGradient id="d5w3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0f2348" stop-opacity="0"/><stop offset="25%" stop-color="#0f2348" stop-opacity="0.4"/><stop offset="50%" stop-color="#0f2348" stop-opacity="1"/><stop offset="75%" stop-color="#0f2348" stop-opacity="0.4"/><stop offset="100%" stop-color="#0f2348" stop-opacity="0"/></linearGradient>
+    </defs>
+    <path class="w1" d="M0,96 C300,68 900,68 1200,96 C1500,124 2100,124 2400,96 L2400,124 L0,124 Z M2400,96 C2700,68 3300,68 3600,96 C3900,124 4500,124 4800,96 L4800,124 L2400,124 Z" fill="url(#d5w1)"></path>
+    <path class="w2" d="M0,132 C300,98 900,98 1200,132 C1500,166 2100,166 2400,132 L2400,166 L0,166 Z M2400,132 C2700,98 3300,98 3600,132 C3900,166 4500,166 4800,132 L4800,166 L2400,166 Z" fill="url(#d5w2)"></path>
+    <path class="w3" d="M0,168 C300,128 900,128 1200,168 C1500,208 2100,208 2400,168 L2400,208 L0,208 Z M2400,168 C2700,128 3300,128 3600,168 C3900,208 4500,208 4800,168 L4800,208 L2400,208 Z" fill="url(#d5w3)"></path>
+  </svg>
+</div>
+
+<!-- ============================================================
+     SECTION 05 — SKILLS
+============================================================ -->
+<section id="skills" class="skills section-pad">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-no">05 / Toolkit</span>
+      <h2 class="section-title">Skills</h2>
+    </div>
+
+    <div class="skills-grid reveal-stagger">
+
+      <div class="skill-group">
+        <h3><span class="dot"></span> Languages</h3>
+        <div class="skill-chips">
+          <span class="skill-chip">Python</span><span class="skill-chip">C++</span><span class="skill-chip">C#</span>
+          <span class="skill-chip">C</span><span class="skill-chip">TypeScript</span><span class="skill-chip">JavaScript</span>
+          <span class="skill-chip">VBA</span><span class="skill-chip">VBScript</span><span class="skill-chip">SQL</span>
+          <span class="skill-chip">HTML</span><span class="skill-chip">CSS</span>
+        </div>
+      </div>
+
+      <div class="skill-group">
+        <h3><span class="dot"></span> Hardware &amp; EDA</h3>
+        <div class="skill-chips">
+          <span class="skill-chip">Altium</span><span class="skill-chip">AutoCAD Electrical</span><span class="skill-chip">Zuken E3</span>
+          <span class="skill-chip">Microstation</span><span class="skill-chip">Arduino</span><span class="skill-chip">Soldering</span>
+          <span class="skill-chip">Breadboarding</span><span class="skill-chip">Schematic Capture</span>
+        </div>
+      </div>
+
+      <div class="skill-group">
+        <h3><span class="dot"></span> Frameworks &amp; Tools</h3>
+        <div class="skill-chips">
+          <span class="skill-chip">React</span><span class="skill-chip">Node.js</span><span class="skill-chip">Claude Code</span>
+          <span class="skill-chip">Codex</span><span class="skill-chip">Excel Macros</span><span class="skill-chip">3DX</span>
+          <span class="skill-chip">SharePoint</span><span class="skill-chip">Git</span>
+        </div>
+      </div>
+
+      <div class="skill-group">
+        <h3><span class="dot"></span> Domain</h3>
+        <div class="skill-chips">
+          <span class="skill-chip">Power Systems</span><span class="skill-chip">Switchgear</span><span class="skill-chip">ATS Schemes</span>
+          <span class="skill-chip">IEC 61850</span><span class="skill-chip">PCB DRC</span><span class="skill-chip">ML Pipelines</span>
+          <span class="skill-chip">Embedded Systems</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- WAVE DIVIDER 6 : decorative SVG art over unified .bg-base. varied ridges; bolt-cyan back, ocean mid, abyss silhouette front. -->
+<div class="wave-divider" aria-hidden="true">
+  <svg viewBox="0 0 2400 240" preserveAspectRatio="none">
+    <defs>
+      <linearGradient id="d6w1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#9ce8ff" stop-opacity="0"/><stop offset="25%" stop-color="#9ce8ff" stop-opacity="0.4"/><stop offset="50%" stop-color="#9ce8ff" stop-opacity="1"/><stop offset="75%" stop-color="#9ce8ff" stop-opacity="0.4"/><stop offset="100%" stop-color="#9ce8ff" stop-opacity="0"/></linearGradient>
+      <linearGradient id="d6w2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a3a6b" stop-opacity="0"/><stop offset="25%" stop-color="#1a3a6b" stop-opacity="0.4"/><stop offset="50%" stop-color="#1a3a6b" stop-opacity="1"/><stop offset="75%" stop-color="#1a3a6b" stop-opacity="0.4"/><stop offset="100%" stop-color="#1a3a6b" stop-opacity="0"/></linearGradient>
+      <linearGradient id="d6w3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#02060f" stop-opacity="0"/><stop offset="25%" stop-color="#02060f" stop-opacity="0.4"/><stop offset="50%" stop-color="#02060f" stop-opacity="1"/><stop offset="75%" stop-color="#02060f" stop-opacity="0.4"/><stop offset="100%" stop-color="#02060f" stop-opacity="0"/></linearGradient>
+    </defs>
+    <path class="w1" d="M0,96 C400,72 800,72 1200,96 C1600,120 2000,120 2400,96 L2400,120 L0,120 Z M2400,96 C2800,72 3200,72 3600,96 C4000,120 4400,120 4800,96 L4800,120 L2400,120 Z" fill="url(#d6w1)"></path>
+    <path class="w2" d="M0,132 C400,102 800,102 1200,132 C1600,162 2000,162 2400,132 L2400,162 L0,162 Z M2400,132 C2800,102 3200,102 3600,132 C4000,162 4400,162 4800,132 L4800,162 L2400,162 Z" fill="url(#d6w2)"></path>
+    <path class="w3" d="M0,168 C400,132 800,132 1200,168 C1600,204 2000,204 2400,168 L2400,204 L0,204 Z M2400,168 C2800,132 3200,132 3600,168 C4000,204 4400,204 4800,168 L4800,204 L2400,204 Z" fill="url(#d6w3)"></path>
+  </svg>
+</div>
+
+<!-- ============================================================
+     SECTION 06 — RESUME
+     Structured CV. Section is fully transparent — only the
+     unified .bg-base paints behind it. Hairlines and chips
+     are the only visible chrome.
+============================================================ -->
+<section id="resume" class="resume section-pad">
+  <div class="wrap">
+    <div class="section-head head-row reveal">
+      <div>
+        <span class="section-no">06 / Manifest</span>
+        <h2 class="section-title">Resume</h2>
+      </div>
+      <a class="resume-pdf" href="resume.pdf" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 4v12"/>
+          <path d="M7 11l5 5 5-5"/>
+          <path d="M5 20h14"/>
+        </svg>
+        Download PDF
+      </a>
+    </div>
+
+    <header class="resume-contact reveal">
+      <p class="rc-name">Kevin Ge</p>
+      <ul class="rc-list">
+        <li><a href="mailto:lingfeng.ge72@gmail.com">lingfeng.ge72@gmail.com</a></li>
+        <li><a href="tel:+17807293618">780-729-3618</a></li>
+        <li><a href="https://www.linkedin.com/in/lingfeng-ge-586b70229" target="_blank" rel="noopener">linkedin.com/in/lingfeng-ge-586b70229</a></li>
+        <li><a href="https://github.com/Kev868" target="_blank" rel="noopener">github.com/Kev868</a></li>
+      </ul>
+    </header>
+
+    <!-- Summary of Qualifications -->
+    <div class="resume-cat reveal">
+      <h3 class="resume-cat-title">Summary of Qualifications</h3>
+      <ul class="resume-bullets">
+        <li>Experience in PCB design, HV schematic capture, power systems, custom component design, embedded systems, microcontrollers, and test automation in power electronics applications utilizing various software applications</li>
+        <li>Skilled in various CAD software usage and scripting in Python, C++, C#, VBS, VBA, and HTML to fit custom needs</li>
+        <li>Hardware team designer on University of Waterloo's Midnight Sun solar EV team collaborating with multiple teams, with proven leadership coordinating 110+ volunteers across nonprofit projects raising $2,500+ for charity</li>
+      </ul>
+    </div>
+
+    <!-- Education -->
+    <div class="resume-cat reveal">
+      <h3 class="resume-cat-title">Education</h3>
+      <article class="resume-entry resume-entry--inline">
+        <div class="rm-primary">
+          <h4 class="resume-entry-title">BASc. Honors Electrical Engineering</h4>
+          <p class="resume-entry-org">University of Waterloo</p>
+        </div>
+        <div class="rm-secondary">
+          <p class="resume-entry-where">Waterloo, ON</p>
+        </div>
+      </article>
+    </div>
+
+    <!-- Employment History -->
+    <div class="resume-cat reveal">
+      <h3 class="resume-cat-title">Employment History</h3>
+
+      <article class="resume-entry">
+        <div class="resume-meta">
+          <div class="rm-primary">
+            <h4 class="resume-entry-title">Electrical Engineering Design Co-op</h4>
+            <p class="resume-entry-org">S&amp;C Electric</p>
+          </div>
+          <div class="rm-secondary">
+            <p class="resume-entry-when">Jan. 2026 – Apr. 2026</p>
+            <p class="resume-entry-where">Toronto, Ontario</p>
+          </div>
+        </div>
+        <div class="resume-content">
+          <ul class="resume-bullets">
+            <li>Designed new scripts and tools to help automate the design process in CAD software using VBA, VBS, HTML, and C#</li>
+            <li>Developed, maintained, and updated legacy code systems to reintroduce outdated tools back into the workflow</li>
+            <li>Utilized E3 and Microstation to draw single line and 3 line schematics for custom HV electrical components</li>
+            <li>Leveraged and created Excel and 3DX macros to efficiently store and retrieve data within large datasets and libraries</li>
+            <li>Created educational documents for the team to better understand modern electrical codes such as IEC 61850</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="resume-entry">
+        <div class="resume-meta">
+          <div class="rm-primary">
+            <h4 class="resume-entry-title">Piano Teacher</h4>
+            <p class="resume-entry-org">RS Music</p>
+          </div>
+          <div class="rm-secondary">
+            <p class="resume-entry-when">Dec. 2023 – Present</p>
+            <p class="resume-entry-where">Calgary, AB</p>
+          </div>
+        </div>
+        <div class="resume-content">
+          <ul class="resume-bullets">
+            <li>Delivered personalized instruction to students across all ages and skill levels, building mentorship and communication skills</li>
+            <li>Developed adaptive lesson plans and consulted with families on curriculum, instruments, and long-term progression strategy</li>
+          </ul>
+        </div>
+      </article>
+    </div>
+
+    <!-- Relevant Experience -->
+    <div class="resume-cat reveal">
+      <h3 class="resume-cat-title">Relevant Experience</h3>
+
+      <article class="resume-entry">
+        <div class="resume-meta">
+          <div class="rm-primary">
+            <h4 class="resume-entry-title">Hardware Design Team Member</h4>
+            <p class="resume-entry-org">Midnight Sun Solar Rayce Car Team</p>
+          </div>
+          <div class="rm-secondary">
+            <p class="resume-entry-when">Oct. 2025 – Present</p>
+            <p class="resume-entry-where">Waterloo, Ontario</p>
+          </div>
+        </div>
+        <div class="resume-content">
+          <ul class="resume-bullets">
+            <li>Designed and simulated multiple 2-layer PCBs with schematic integration and optimized component placement</li>
+            <li>Utilised custom libraries and conducted DRCs to ensure compliance with safety and manufacturing standards</li>
+            <li>Enhanced circuit efficiency through component selection, power calculations, and manufacturability considerations</li>
+            <li>Documented design process and safety considerations in technical reports for future iterations and team knowledge transfer</li>
+          </ul>
+        </div>
+      </article>
+    </div>
+
+    <!-- Projects -->
+    <div class="resume-cat reveal">
+      <h3 class="resume-cat-title">Projects</h3>
+
+      <article class="resume-entry">
+        <div class="resume-meta">
+          <div class="rm-primary">
+            <h4 class="resume-entry-title">Custom &ldquo;Homepod&rdquo; Device</h4>
+          </div>
+          <div class="rm-secondary">
+            <p class="resume-entry-when">Nov. 2025 – Jan. 2026</p>
+          </div>
+        </div>
+        <div class="resume-content">
+          <div class="resume-tech">
+            <span class="resume-tech-tag">AutoCAD Electrical</span>
+            <span class="resume-tech-tag">Soldering</span>
+            <span class="resume-tech-tag">Excel</span>
+            <span class="resume-tech-tag">Python</span>
+            <span class="resume-tech-tag">C</span>
+          </div>
+          <ul class="resume-bullets">
+            <li>Developed a device able to recognise voice commands and perform household functions such as temperature regulation</li>
+            <li>Optimized circuit design, sensor compatibility and integration, and power regulation to reduce energy inefficiency</li>
+            <li>Collaborated with software engineer to troubleshoot integration issues, applying debugging techniques to ensure reliability</li>
+            <li>Produced CAD schematics and technical documentation for replication and future development</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="resume-entry">
+        <div class="resume-meta">
+          <div class="rm-primary">
+            <h4 class="resume-entry-title">ATSimulator</h4>
+          </div>
+          <div class="rm-secondary">
+            <p class="resume-entry-when">Mar. 2026 – Present</p>
+          </div>
+        </div>
+        <div class="resume-content">
+          <div class="resume-tech">
+            <span class="resume-tech-tag">TypeScript</span>
+            <span class="resume-tech-tag">Python</span>
+            <span class="resume-tech-tag">Claude Code</span>
+            <span class="resume-tech-tag">Codex</span>
+            <span class="resume-tech-tag">React</span>
+            <span class="resume-tech-tag">Power Systems</span>
+          </div>
+          <ul class="resume-bullets">
+            <li>Developed a browser-based Automatic Transfer Switch simulator using React and TypeScript, featuring a graph-based circuit engine that computes energization paths, breaker state logic, and open/closed/fast transfer sequences in real time</li>
+            <li>Engineered a CAD-style topology editor with snap-to-grid placement, orthogonal wire routing, and port-aware rotation</li>
+            <li>Optimized engine to decouple simulation time from clock time, supporting playback speed from 0.05x to 5x</li>
+            <li>Implemented a connectivity solver using BFS flood-fill to model breaker interlock logic, sync-check gating, undervoltage pickup delays, and automatic retransfer sequencing</li>
+          </ul>
+        </div>
+      </article>
+    </div>
+
+    <!-- Technical Skills -->
+    <div class="resume-cat reveal">
+      <h3 class="resume-cat-title">Technical Skills</h3>
+      <div class="resume-skills">
+
+        <div class="resume-skill-group">
+          <h4 class="resume-skill-label">Hardware / Design</h4>
+          <div class="resume-chips">
+            <span class="resume-chip">PCB Design (Altium)</span>
+            <span class="resume-chip">Circuit Design</span>
+            <span class="resume-chip">Breadboarding</span>
+            <span class="resume-chip">AutoCAD Electrical</span>
+            <span class="resume-chip">Microstation</span>
+            <span class="resume-chip">Zuken E3</span>
+          </div>
+        </div>
+
+        <div class="resume-skill-group">
+          <h4 class="resume-skill-label">Programming</h4>
+          <div class="resume-chips">
+            <span class="resume-chip">Python</span>
+            <span class="resume-chip">C++</span>
+            <span class="resume-chip">C#</span>
+            <span class="resume-chip">C</span>
+            <span class="resume-chip">VBScript</span>
+            <span class="resume-chip">VBA</span>
+            <span class="resume-chip">ML pipeline</span>
+            <span class="resume-chip">HTML</span>
+            <span class="resume-chip">JavaScript</span>
+            <span class="resume-chip">Claude</span>
+            <span class="resume-chip">Codex</span>
+            <span class="resume-chip">CSS</span>
+            <span class="resume-chip">React</span>
+            <span class="resume-chip">SQL</span>
+          </div>
+        </div>
+
+        <div class="resume-skill-group">
+          <h4 class="resume-skill-label">Software</h4>
+          <div class="resume-chips">
+            <span class="resume-chip">Microsoft Office (Excel, Word, PowerPoint)</span>
+            <span class="resume-chip">Arduino Uno</span>
+            <span class="resume-chip">SharePoint</span>
+            <span class="resume-chip">Teams</span>
+            <span class="resume-chip">Claude Agents</span>
+          </div>
+        </div>
+
+        <div class="resume-skill-group">
+          <h4 class="resume-skill-label">Professional</h4>
+          <div class="resume-chips">
+            <span class="resume-chip">Leadership</span>
+            <span class="resume-chip">Public Speaking</span>
+            <span class="resume-chip">Mentorship</span>
+            <span class="resume-chip">Technical Writing</span>
+            <span class="resume-chip">Collaboration</span>
+            <span class="resume-chip">Electrical Codes</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 07 — CONTACT
+============================================================ -->
+<section id="contact" class="contact section-pad">
+  <div class="wrap">
+    <div class="contact-inner reveal-stagger">
+      <span class="eyebrow" style="font-family:var(--font-mono); font-size:.78rem; font-weight:500; letter-spacing:.32em; text-transform:uppercase; color:var(--electric);">Let's Build Something</span>
+
+      <h2 class="contact-title">Have a project, role, or idea worth <em>chasing?</em></h2>
+
+      <p class="contact-lead">Always open to conversations about power, controls, embedded systems, or collaborations on side projects. Reply within 24 hours.</p>
+
+      <div class="contact-buttons">
+        <a class="contact-btn" href="mailto:lingfeng.ge72@gmail.com">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 7 9-7"/></svg>
+          Email
+        </a>
+        <a class="contact-btn" href="https://www.linkedin.com/in/lingfeng-ge-586b70229" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h4v4H4zM4 10h4v10H4zM10 10h4v1.6c.7-1.2 2.2-1.9 3.6-1.9 3 0 4.4 2 4.4 5V20h-4v-4.6c0-1.6-.6-2.4-1.8-2.4-1.4 0-2.2 1-2.2 2.5V20h-4z"/></svg>
+          LinkedIn
+        </a>
+        <a class="contact-btn" href="https://github.com/Kev868" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.58 2 12.21c0 4.5 2.87 8.32 6.84 9.67.5.09.68-.22.68-.49v-1.7c-2.78.62-3.37-1.36-3.37-1.36-.46-1.18-1.11-1.49-1.11-1.49-.91-.63.07-.62.07-.62 1 .07 1.53 1.05 1.53 1.05.89 1.56 2.34 1.11 2.91.85.09-.66.35-1.11.63-1.37-2.22-.26-4.55-1.13-4.55-5.04 0-1.11.39-2.02 1.03-2.74-.1-.26-.45-1.3.1-2.7 0 0 .84-.27 2.75 1.05A9.4 9.4 0 0 1 12 6.84a9.4 9.4 0 0 1 2.5.34c1.91-1.32 2.75-1.05 2.75-1.05.55 1.4.2 2.44.1 2.7.64.72 1.03 1.63 1.03 2.74 0 3.92-2.34 4.78-4.57 5.03.36.32.68.94.68 1.9v2.81c0 .27.18.59.69.49C19.14 20.52 22 16.7 22 12.21 22 6.58 17.52 2 12 2z"/></svg>
+          GitHub
+        </a>
+      </div>
+
+      <div class="footer-rule"></div>
+      <div class="footer-row">
+        <span>Lingfeng Ge · Designed &amp; Built 2026 · Waterloo ⇄ Calgary</span>
+        <span>v1.0</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     LIGHTBOX — image viewer overlay (closed by default)
+============================================================ -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Image viewer">
+  <button class="lightbox-close" type="button" aria-label="Close image viewer">×</button>
+  <div class="lightbox-content">
+    <img class="lightbox-img" alt="">
+    <p class="lightbox-caption"></p>
+  </div>
+</div>
+
+<!-- ============================================================
+     JS — scroll reveals + lightbox
+============================================================ -->
+<script>
+(function(){
+  // ---- Scroll reveals ----
+  const reveals = document.querySelectorAll('.reveal, .reveal-stagger');
+  if (!('IntersectionObserver' in window)) {
+    reveals.forEach(el => el.classList.add('in-view'));
+  } else {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('in-view');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+    reveals.forEach(el => io.observe(el));
+  }
+
+  // ---- Lightbox ----
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = lightbox.querySelector('.lightbox-img');
+  const lightboxCaption = lightbox.querySelector('.lightbox-caption');
+  const lightboxClose = lightbox.querySelector('.lightbox-close');
+  let prevFocus = null;
+
+  function open(img) {
+    lightboxImg.src = img.currentSrc || img.src;
+    lightboxImg.alt = img.alt || '';
+    lightboxCaption.textContent = img.dataset.caption || img.alt || '';
+    lightbox.classList.add('is-open');
+    lightbox.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    prevFocus = document.activeElement;
+    lightboxClose.focus();
+  }
+  function close() {
+    lightbox.classList.remove('is-open');
+    lightbox.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    lightboxImg.src = '';
+    if (prevFocus && prevFocus.focus) prevFocus.focus();
+  }
+
+  document.querySelectorAll('.project-image').forEach(img => {
+    img.addEventListener('click', () => open(img));
+  });
+  // Close on backdrop click (not on the inner content)
+  lightbox.addEventListener('click', (e) => {
+    if (e.target === lightbox) close();
+  });
+  lightboxClose.addEventListener('click', close);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && lightbox.classList.contains('is-open')) close();
+  });
+})();
+</script>
+
+</body>
+</html>

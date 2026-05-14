@@ -1,0 +1,250 @@
+/* ============================================================
+   Kevin Ge — Abyssal Design System
+   Foundation tokens: color, type, motion, spacing
+   ------------------------------------------------------------
+   Motif: a vertical descent through ocean water — abyss to sky —
+   punctuated by infrequent electric sparks (a nod to EE).
+   ============================================================ */
+
+/* ---- Webfonts: Google Fonts (no local files required) ---- */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@200..600&display=swap');
+
+:root {
+  /* ---------- COLOR — Vertical journey, abyss → sky ---------- */
+  --abyss:        #02060f;  /* near-black ocean depth */
+  --midnight:     #060d1f;  /* midnight blue */
+  --deep-night:   #0a1430;
+  --navy:         #0f2348;
+  --ocean:        #1a3a6b;
+  --deep-blue:    #2563ac;
+  --sea:          #4a8bc9;
+  --sky:          #7ab8e8;
+  --baby:         #b8d9f0;  /* baby blue */
+  --seafoam:      #c8e8e0;  /* seafoam highlights */
+  --teal:         #2db4a0;  /* teal accent */
+  --electric:     #5dd9f5;  /* electric cyan — sparks, links */
+  --bolt:         #9ce8ff;  /* brightest electric highlight */
+  --silver:       #cad4e0;  /* silvery linings on water */
+  --silver-glow:  #e4ecf5;  /* primary heading text on dark */
+  --paper:        #eef4fa;  /* body text on dark */
+  --ink:          #02060f;  /* dark text on bright sections */
+
+  /* ---- Semantic aliases ---- */
+  --bg:           var(--midnight);
+  --bg-deep:      var(--abyss);
+  --bg-bright:    var(--sea);
+  --fg:           var(--paper);
+  --fg-strong:    var(--silver-glow);
+  --fg-muted:     color-mix(in srgb, var(--paper) 60%, transparent);
+  --fg-dim:       color-mix(in srgb, var(--paper) 40%, transparent);
+  --fg-on-bright: var(--ink);
+  --accent:       var(--electric);
+  --accent-soft:  var(--teal);
+  --accent-hot:   var(--bolt);
+  --rule:         color-mix(in srgb, var(--silver) 22%, transparent);
+  --rule-bright:  color-mix(in srgb, var(--electric) 40%, transparent);
+
+  /* Glassmorphic surfaces */
+  --glass:        color-mix(in srgb, var(--midnight) 55%, transparent);
+  --glass-bright: color-mix(in srgb, var(--paper) 8%, transparent);
+  --glass-border: color-mix(in srgb, var(--silver) 18%, transparent);
+
+  /* ---------- TYPE — Families ---------- */
+  --font-display: 'Fraunces', 'Times New Roman', Georgia, serif;
+  --font-body:    'Outfit', 'Helvetica Neue', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  /* ---- Type scale (fluid where useful) ---- */
+  --t-eyebrow:   0.78rem;     /* 12.5px — mono labels */
+  --t-mono-sm:   0.72rem;     /* 11.5px — chips, meta */
+  --t-mono-md:   0.86rem;
+  --t-body-sm:   0.92rem;
+  --t-body:      1.05rem;
+  --t-body-lg:   1.18rem;
+  --t-h6:        1.35rem;
+  --t-h5:        1.65rem;
+  --t-h4:        2.0rem;
+  --t-h3:        clamp(2.2rem, 3.4vw, 3.0rem);
+  --t-h2:        clamp(2.8rem, 5vw, 4.4rem);
+  --t-h1:        clamp(3.6rem, 8.4vw, 7.6rem);
+  --t-display:   clamp(4.5rem, 11vw, 9.5rem);
+
+  --lh-tight:    1.05;
+  --lh-snug:     1.2;
+  --lh-body:     1.55;
+  --lh-loose:    1.75;
+
+  /* Letter spacing — tight for display, generous for mono */
+  --ls-display:  -0.02em;
+  --ls-tight:    -0.01em;
+  --ls-normal:   0;
+  --ls-wide:     0.08em;
+  --ls-mono:     0.16em;
+  --ls-mono-lg:  0.22em;
+  --ls-mono-xl:  0.32em;
+
+  /* ---------- SPACING ---------- */
+  --s-1:  4px;
+  --s-2:  8px;
+  --s-3:  12px;
+  --s-4:  16px;
+  --s-5:  24px;
+  --s-6:  32px;
+  --s-7:  48px;
+  --s-8:  64px;
+  --s-9:  96px;
+  --s-10: 128px;
+
+  /* Section rhythm */
+  --section-py:  clamp(80px, 12vh, 160px);
+  --gutter:      clamp(24px, 5vw, 80px);
+  --maxw:        1240px;
+
+  /* ---------- RADII ---------- */
+  --r-1: 4px;
+  --r-2: 8px;
+  --r-3: 14px;
+  --r-4: 22px;     /* card radius */
+  --r-pill: 999px;
+
+  /* ---------- SHADOWS ---------- */
+  --sh-card:   0 2px 0 0 color-mix(in srgb, var(--silver) 6%, transparent) inset,
+               0 30px 60px -30px rgba(0,0,0,0.65);
+  --sh-glow:   0 0 0 1px color-mix(in srgb, var(--electric) 50%, transparent),
+               0 0 28px color-mix(in srgb, var(--electric) 35%, transparent);
+  --sh-spark:  0 0 4px var(--bolt),
+               0 0 12px var(--electric),
+               0 0 28px color-mix(in srgb, var(--electric) 60%, transparent);
+  --sh-soft:   0 12px 40px -12px rgba(0,0,0,0.55);
+
+  /* ---------- MOTION ---------- */
+  --ease-water: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-spark: cubic-bezier(0.7, 0, 0.2, 1);
+  --dur-fast:   180ms;
+  --dur:        320ms;
+  --dur-slow:   620ms;
+}
+
+/* ============================================================
+   SEMANTIC ELEMENT DEFAULTS
+   These are the "h1, h2, p, code…" defaults a designer/dev can
+   rely on when dropping an element onto an abyss/midnight bg.
+   ============================================================ */
+
+.ds-root, .ds-root * { box-sizing: border-box; }
+
+.ds-root {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Display / headings */
+.h-display, .ds-root .h-display {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: var(--t-display);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-display);
+  color: var(--fg-strong);
+  font-variation-settings: "opsz" 144, "SOFT" 50;
+  text-wrap: balance;
+}
+.h1 { font: 300 var(--t-h1)/var(--lh-tight) var(--font-display); letter-spacing: var(--ls-display); color: var(--fg-strong); text-wrap: balance; }
+.h2 { font: 300 var(--t-h2)/var(--lh-snug)  var(--font-display); letter-spacing: var(--ls-display); color: var(--fg-strong); text-wrap: balance; }
+.h3 { font: 400 var(--t-h3)/var(--lh-snug)  var(--font-display); letter-spacing: var(--ls-tight);   color: var(--fg-strong); }
+.h4 { font: 400 var(--t-h4)/var(--lh-snug)  var(--font-display); color: var(--fg-strong); }
+.h5 { font: 500 var(--t-h5)/var(--lh-snug)  var(--font-body);    color: var(--fg-strong); }
+.h6 { font: 500 var(--t-h6)/var(--lh-snug)  var(--font-body);    color: var(--fg-strong); }
+
+/* Italic-Fraunces accent — used inside headlines for emphasis words */
+.italic-accent {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+}
+
+/* Gradient text — used on the italicized accent word in hero/contact */
+.text-tide {
+  background: linear-gradient(100deg, var(--baby) 0%, var(--electric) 50%, var(--seafoam) 100%);
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+}
+
+/* Body */
+.p           { font-size: var(--t-body); line-height: var(--lh-body); color: var(--fg); }
+.p-lead      { font-family: var(--font-display); font-style: italic; font-weight: 300;
+               font-size: var(--t-body-lg); line-height: var(--lh-loose); color: var(--fg); }
+.p-muted     { color: var(--fg-muted); }
+
+/* Mono — eyebrows, section numbers, chips */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--t-eyebrow);
+  font-weight: 500;
+  letter-spacing: var(--ls-mono-lg);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.eyebrow-muted { color: var(--fg-muted); }
+.section-no {
+  font-family: var(--font-mono);
+  font-size: var(--t-mono-md);
+  letter-spacing: var(--ls-mono-lg);
+  color: var(--fg-muted);
+  text-transform: uppercase;
+}
+.tag, .chip {
+  font-family: var(--font-mono);
+  font-size: var(--t-mono-sm);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--fg);
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--rule);
+  background: var(--glass-bright);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Links */
+.a, a.ds-link {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color var(--dur) var(--ease-water);
+}
+.a:hover, a.ds-link:hover { color: var(--accent-hot); }
+
+/* Code / mono inline */
+code, .code {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  color: var(--bolt);
+  background: color-mix(in srgb, var(--electric) 8%, transparent);
+  padding: 2px 6px;
+  border-radius: var(--r-1);
+}
+
+/* Drop-cap (used on the About bio) */
+.dropcap::first-letter {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 4.8em;
+  line-height: 0.85;
+  float: left;
+  padding: 6px 12px 0 0;
+  color: var(--accent);
+}
+
+/* Reduced motion — collapse animation durations */
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur-fast: 1ms; --dur: 1ms; --dur-slow: 1ms; }
+}
