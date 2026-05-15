@@ -1,6 +1,6 @@
 # Personal Site — Lingfeng Kevin Ge
 
-Single-page hi-fi portfolio. **`index.html` is self-contained** — embedded CSS + inline JS + inline SVG, no build step, no external libraries beyond Google Fonts. Open it directly in a browser.
+Single-page hi-fi portfolio. **`index.html` is self-contained** — embedded CSS + inline JS + inline SVG, no build step, no external libraries beyond Google Fonts. Open it directly in a browser. Hosted in Vercel
 
 ## What's inside the page
 
