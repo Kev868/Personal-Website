@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Lingfeng Kevin Ge — Electrical Engineering</title>
-<meta name="description" content="Lingfeng Kevin Ge — Electrical Engineering at the University of Waterloo. Power systems, controls, and the things that hum between them.">
+<title>Lingfeng Kevin Ge, Electrical Engineering</title>
+<meta name="description" content="Lingfeng Kevin Ge, Electrical Engineering at the University of Waterloo.">
 
 <!-- ============================================================
      FONTS — Fraunces (display variable serif) · Outfit (body) ·
@@ -261,6 +261,15 @@ section { position:relative; z-index:3; }
 .head-row { display:flex; justify-content:space-between; align-items:flex-end; gap:48px; flex-wrap:wrap; }
 .head-row .section-tagline { text-align:right; }
 
+/* Warm intro line — sits between the section-no eyebrow and the
+   "About" display heading. Smaller and lighter than .section-title. */
+.about-greeting {
+  font-family:var(--font-display); font-style:italic; font-weight:300;
+  font-size:clamp(1.3rem, 2.4vw, 1.7rem); line-height:1.3;
+  letter-spacing:-.005em; color:var(--fg);
+  margin:0 0 12px;
+}
+
 /* ============================================================
    7.  HERO
 ============================================================ */
@@ -314,31 +323,6 @@ section { position:relative; z-index:3; }
   background:linear-gradient(100deg, var(--baby) 0%, var(--electric) 50%, var(--seafoam) 100%);
   -webkit-background-clip:text; background-clip:text; color:transparent;
 }
-
-.hero-sub {
-  font-family:var(--font-display); font-style:italic; font-weight:300;
-  font-size:clamp(1.15rem,2.2vw,1.55rem);
-  line-height:1.5; color:var(--fg);
-  max-width:680px; margin:0 auto 44px;
-  opacity:0; animation:fadeUp 1s var(--ease-water) .8s forwards;
-}
-
-.pill-row {
-  display:flex; flex-wrap:wrap; gap:12px; justify-content:center;
-  margin-bottom:80px;
-  opacity:0; animation:fadeUp 1s var(--ease-water) 1.1s forwards;
-}
-.pill {
-  font-family:var(--font-mono); font-size:.72rem; font-weight:500;
-  letter-spacing:.16em; text-transform:uppercase; color:var(--fg);
-  padding:10px 18px;
-  border-radius:var(--r-pill);
-  border:1px solid var(--rule);
-  background:var(--glass-bright);
-  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
-  transition:transform var(--dur) var(--ease-water), border-color var(--dur) var(--ease-water), color var(--dur) var(--ease-water);
-}
-.pill:hover { transform:translateY(-2px); border-color:var(--electric); color:var(--bolt); }
 
 .scroll-cue {
   display:flex; flex-direction:column; align-items:center; gap:14px;
@@ -413,7 +397,7 @@ section { position:relative; z-index:3; }
 ============================================================ */
 .project-grid {
   display:grid; gap:28px;
-  grid-template-columns:repeat(auto-fit, minmax(340px, 1fr));
+  grid-template-columns:1fr 1fr;     /* 50/50 — two real cards split the row */
 }
 .project-card {
   position:relative;
@@ -657,49 +641,57 @@ section { position:relative; z-index:3; }
 .lightbox-close:hover { border-color:var(--electric); color:var(--electric); }
 
 /* ============================================================
-   13. ACHIEVEMENTS — bright cards float on the unified dark base.
-   The section heading inherits the standard light-on-dark theme;
-   only the .ach-card surfaces are bright with dark text.
+   13. HIGHLIGHTS — translucent cards on the unified dark base.
+   Same architectural pattern as .project-card / .pcb-card:
+   var(--glass-bright) surface, hairline border, light text.
+   2×2 grid at desktop/tablet, single column at <768px.
 ============================================================ */
 .ach-grid {
   display:grid; gap:24px;
-  grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns:repeat(2, 1fr);     /* 2-up at all desktop+tablet widths */
+  grid-auto-rows:1fr;                       /* equal heights across rows */
+}
+@media (max-width:767px) {
+  .ach-grid { grid-template-columns:1fr; }   /* single column on mobile */
 }
 .ach-card {
-  background:rgba(238,244,250,.92);
-  border:1px solid rgba(2,6,15,.08);
+  background:var(--glass-bright);
+  border:1px solid var(--rule);
   border-radius:var(--r-4);
   padding:28px;
   display:flex; flex-direction:column; gap:14px;
-  transition:transform var(--dur) var(--ease-water), box-shadow var(--dur) var(--ease-water);
-  box-shadow:0 20px 40px -20px rgba(2,6,15,.35);
+  transition:transform var(--dur) var(--ease-water),
+             border-color var(--dur) var(--ease-water),
+             box-shadow var(--dur) var(--ease-water);
+  box-shadow:0 30px 60px -30px rgba(0,0,0,.65);
 }
 .ach-card:hover {
   transform:translateY(-6px);
-  box-shadow:0 30px 60px -20px rgba(2,6,15,.45);
+  border-color:var(--rule-bright);
+  box-shadow:0 40px 80px -30px rgba(0,0,0,.75);
 }
 .ach-badge {
   display:inline-flex; align-items:center; gap:10px;
   font-family:var(--font-mono); font-size:.7rem; font-weight:500;
   letter-spacing:.22em; text-transform:uppercase;
-  color:var(--ocean);
+  color:var(--electric);
   align-self:flex-start;
 }
 .ach-badge .dot {
   width:7px; height:7px; border-radius:50%;
-  background:var(--teal);
-  box-shadow:0 0 10px rgba(45,180,160,.7);
+  background:var(--electric);
+  box-shadow:0 0 10px rgba(93,217,245,.7);
 }
 .ach-title {
   font-family:var(--font-display); font-weight:400;
   font-size:1.45rem; line-height:1.2; letter-spacing:-.01em;
-  color:var(--ink);
+  color:var(--fg-strong);
 }
 .ach-place {
   font-family:var(--font-display); font-style:italic; font-weight:300;
-  font-size:1rem; color:var(--ocean);
+  font-size:1rem; color:var(--fg-muted);
 }
-.ach-prose { font-size:.92rem; line-height:1.6; color:rgba(2,6,15,.72); }
+.ach-prose { font-size:.92rem; line-height:1.6; color:var(--fg); }
 
 /* ============================================================
    14. SKILLS
@@ -1067,6 +1059,7 @@ section { position:relative; z-index:3; }
 @media (max-width:880px) {
   .nav-row { padding:14px var(--gutter); }
   .nav-links { display:none; }
+  .project-grid { grid-template-columns:1fr; }
   .pcb-grid { grid-template-columns:1fr; }
   .head-row { flex-direction:column; align-items:flex-start; }
   .head-row .section-tagline { text-align:left; }
@@ -1137,7 +1130,7 @@ section { position:relative; z-index:3; }
       <li><a href="#about">About</a></li>
       <li><a href="#software">Software</a></li>
       <li><a href="#hardware">Hardware</a></li>
-      <li><a href="#achievements">Achievements</a></li>
+      <li><a href="#highlights">Highlights</a></li>
       <li><a href="#resume">Resume</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
@@ -1156,14 +1149,6 @@ section { position:relative; z-index:3; }
     </div>
 
     <h1 class="hero-title">Lingfeng <em>Kevin</em> Ge</h1>
-
-    <p class="hero-sub">Power systems, controls, and the things that hum between them.</p>
-
-    <div class="pill-row">
-      <span class="pill">S&amp;C Electric · Co-op</span>
-      <span class="pill">Midnight Sun Solar Car</span>
-      <span class="pill">Calgary ⇄ Waterloo</span>
-    </div>
 
     <div class="scroll-cue">
       <span class="label">Scroll</span>
@@ -1206,13 +1191,12 @@ section { position:relative; z-index:3; }
   <div class="wrap">
     <div class="section-head reveal">
       <span class="section-no">01 / At Anchor</span>
+      <p class="about-greeting">Hi there! I&rsquo;m Kevin Ge</p>
       <h2 class="section-title">About</h2>
     </div>
 
     <div class="bio reveal">
-      <p>An Electrical Engineering student at the University of Waterloo currently designing high-voltage switchgear systems at S&amp;C Electric — automating CAD workflows in Zuken E3 with C# and VBA, drafting single-line and three-line schematics, and modernizing legacy tooling.</p>
-      <p>Drawn to the physical end of the field: power systems, controls, applications engineering. The kind of work where the diagram on the screen connects to copper that carries real current.</p>
-      <p>Outside of EE: a piano teacher in Calgary, hardware design contributor on the Midnight Sun Solar Rayce Car team, and a lifelong builder who keeps a small shop of personal projects running in parallel with school.</p>
+      <p>Electrical engineering student at UWaterloo. From schematics, PCBs, and firmware to power systems, electrical grids, and the script that draws the schematic to the simulator that catches what the schematic missed. I like taking systems from ideas to live circuit, then writing the tooling so the next person can do it twice as fast. The diagram on the screen and the copper that carries real current are two parts of the same project to me. On paper a Waterloo EE student; in practice a builder who keeps finding problems that want both a soldering iron and a script editor.</p>
     </div>
   </div>
 </section>
@@ -1261,7 +1245,7 @@ section { position:relative; z-index:3; }
           <span class="card-index">Project 01</span>
           <h3 class="card-title">ATSimulator</h3>
           <div class="card-stack"><span>React</span><span>·</span><span>TypeScript</span><span>·</span><span>Power Systems</span></div>
-          <p class="card-prose">A browser-based Automatic Transfer Switch simulator with a CAD-style topology editor. Build any switchgear scheme — Two-Source, Main-Tie-Main, Main-Main-Main, or fully custom — and watch open transition, closed transition with sync-check, and fast transfer events execute in real time.</p>
+          <p class="card-prose">A browser-based Automatic Transfer Switch simulator with a CAD-style topology editor. Build any switchgear scheme (Two-Source, Main-Tie-Main, Main-Main-Main, or fully custom) and watch open transition, closed transition with sync-check, and fast transfer events execute in real time.</p>
           <ul class="card-bullets">
             <li>Graph-based connectivity engine using BFS flood-fill energization</li>
             <li>Snap-to-grid editor with port-aware rotation and orthogonal wire routing</li>
@@ -1286,7 +1270,7 @@ section { position:relative; z-index:3; }
           <span class="card-index">Project 02</span>
           <h3 class="card-title">HomePOD</h3>
           <div class="card-stack"><span>Arduino</span><span>·</span><span>C</span><span>·</span><span>Python</span><span>·</span><span>Soldering</span></div>
-          <p class="card-prose">A custom voice-controlled smart home device. Recognizes spoken commands and drives household functions — temperature regulation, environmental sensing, scheduled tasks — over a hand-soldered control board with custom CAD schematics.</p>
+          <p class="card-prose">A custom voice-controlled smart home device. Recognizes spoken commands and drives household functions (temperature regulation, environmental sensing, scheduled tasks) over a hand-soldered control board with custom CAD schematics.</p>
           <ul class="card-bullets">
             <li>Voice command pipeline with sensor integration and power regulation</li>
             <li>Hand-soldered prototype with AutoCAD Electrical schematic documentation</li>
@@ -1297,8 +1281,10 @@ section { position:relative; z-index:3; }
         <a class="card-link" href="https://github.com/Kev868/HomePOD" target="_blank" rel="noopener">View on GitHub <span class="arrow">→</span></a>
       </article>
 
-      <!-- PROJECT 03 — PLACEHOLDER (replace when next project lands) -->
-      <article class="project-card placeholder">
+      <!-- PROJECT 03 — PLACEHOLDER (replace when next project lands)
+           Currently hidden via inline display:none — code preserved.
+           To re-enable: remove the style attribute on the article below. -->
+      <article class="project-card placeholder" style="display:none">
         <div class="glyph">+</div>
         <div class="ph-title">Future Project</div>
         <div class="ph-sub">More currents on the way</div>
@@ -1348,7 +1334,7 @@ section { position:relative; z-index:3; }
                    alt="First PCB design for the Midnight Sun solar vehicle project"
                    width="832" height="583"
                    loading="lazy" decoding="async"
-                   data-caption="First PCB design — Midnight Sun Solar Rayce Car">
+                   data-caption="First PCB design, Midnight Sun Solar Rayce Car">
               <figcaption class="pcb-image-caption">First PCB design</figcaption>
             </figure>
             <figure class="pcb-image-wrap">
@@ -1357,7 +1343,7 @@ section { position:relative; z-index:3; }
                    alt="Second PCB design for the Midnight Sun solar vehicle project"
                    width="1500" height="708"
                    loading="lazy" decoding="async"
-                   data-caption="Second PCB design — Midnight Sun Solar Rayce Car">
+                   data-caption="Second PCB design, Midnight Sun Solar Rayce Car">
               <figcaption class="pcb-image-caption">Second PCB design</figcaption>
             </figure>
           </div>
@@ -1366,7 +1352,7 @@ section { position:relative; z-index:3; }
           <span class="card-index">Midnight Sun</span>
           <h3 class="card-title">Solar Rayce Car</h3>
           <p class="pcb-meta">2-Layer · Altium · Solar Rayce Team · 2025–Present</p>
-          <p class="pcb-prose">Designed and simulated 2-layer PCBs for the Waterloo Midnight Sun Solar Rayce Car team — schematic integration, optimized component placement, custom libraries, and DRCs. Circuit-efficiency, power-calculation, and manufacturability considerations carried through to documented technical reports for future iterations.</p>
+          <p class="pcb-prose">Designed and simulated 2-layer PCBs for the Waterloo Midnight Sun Solar Rayce Car team: schematic integration, optimized component placement, custom libraries, and DRCs. Circuit-efficiency, power-calculation, and manufacturability considerations carried through to documented technical reports for future iterations.</p>
           <div class="pcb-tags">
             <span class="pcb-tag">Altium</span>
             <span class="pcb-tag">Schematic Capture</span>
@@ -1396,39 +1382,47 @@ section { position:relative; z-index:3; }
 </div>
 
 <!-- ============================================================
-     SECTION 04 — ACHIEVEMENTS  (BRIGHT — dark text on bright water)
-     *** Add cards by duplicating .ach-card pattern below ***
+     SECTION 04 — HIGHLIGHTS
+     2×2 grid of populated cards. Eyebrow keeps the existing
+     "04 / Surfacing" thematic numbering.
 ============================================================ -->
-<section id="achievements" class="achievements section-pad">
+<section id="highlights" class="highlights section-pad">
   <div class="wrap">
     <div class="section-head head-row reveal">
       <div>
         <span class="section-no">04 / Surfacing</span>
-        <h2 class="section-title">Achievements</h2>
+        <h2 class="section-title">Highlights</h2>
       </div>
     </div>
 
     <div class="ach-grid reveal-stagger">
 
       <article class="ach-card">
-        <span class="ach-badge"><span class="dot"></span> S&amp;C Electric · Co-op</span>
-        <h3 class="ach-title">Design Engineer</h3>
+        <span class="ach-badge"><span class="dot"></span> S&amp;C Electric · Design Automation</span>
+        <h3 class="ach-title">Switchgear CAD Tooling</h3>
         <p class="ach-place">Toronto, ON · Jan 2026 – Apr 2026</p>
-        <p class="ach-prose">Building automation tooling for HV switchgear schematic generation in Zuken E3 — VBA, VBS, C#, HTML — alongside Microstation drafting work for custom electrical components.</p>
+        <p class="ach-prose">Wrote C# and VBA tooling for Zuken E3 to automate high-voltage switchgear documentation: a custom BOM exporter, wire-connection data extraction through the ReportGenerator COM API, and bay-grouped device-name output with natural sort. Modernized legacy scripts and built an Excel-based MTM ATS simulator for internal use.</p>
       </article>
 
       <article class="ach-card">
-        <span class="ach-badge"><span class="dot"></span> Solar Car · Hardware</span>
-        <h3 class="ach-title">Hardware Design Team Member</h3>
-        <p class="ach-place">University of Waterloo Midnight Sun Solar Rayce</p>
-        <p class="ach-prose">Designed and simulated 2-layer PCBs for Waterloo's Midnight Sun Solar Rayce Car team — schematic integration, optimized component placement, custom libraries, and DRCs to ensure compliance with safety and manufacturing standards.</p>
+        <span class="ach-badge"><span class="dot"></span> Midnight Sun · Hardware</span>
+        <h3 class="ach-title">Solar Vehicle PCB Design</h3>
+        <p class="ach-place">Waterloo, ON · Oct 2025 – Present</p>
+        <p class="ach-prose">Designing 2-layer PCBs for the University of Waterloo's Midnight Sun solar racing team: schematic capture, component placement, custom libraries, and DRCs against safety and manufacturing standards. Documenting design choices and trade-offs for future iterations and team knowledge transfer.</p>
       </article>
 
       <article class="ach-card">
-        <span class="ach-badge"><span class="dot"></span> RS Music · Piano Teacher</span>
-        <h3 class="ach-title">Instructor</h3>
-        <p class="ach-place">Calgary, AB · Dec. 2023 – Present</p>
-        <p class="ach-prose">Personalized instruction across all ages and skill levels, with adaptive lesson plans and long-term progression strategy.</p>
+        <span class="ach-badge"><span class="dot"></span> Advocacy · Leadership</span>
+        <h3 class="ach-title">Public Speaking &amp; Nonprofit Organizing</h3>
+        <p class="ach-place">Provincially Recognized</p>
+        <p class="ach-prose">Provincially recognized public speaker and nonprofit organizer. Led volunteer teams of 110+ across charitable projects that raised thousands for community causes, spanning event coordination, mentorship, and on-stage advocacy.</p>
+      </article>
+
+      <article class="ach-card">
+        <span class="ach-badge"><span class="dot"></span> Independent Project · Power Systems</span>
+        <h3 class="ach-title">ATSimulator</h3>
+        <p class="ach-place">Web · Mar 2026 – Present</p>
+        <p class="ach-prose">A browser-based Automatic Transfer Switch simulator built in React and TypeScript. A graph-based circuit engine computes energization paths, breaker state logic, and open/closed/fast transfer sequences in real time, paired with a CAD-style topology editor for building the underlying schematics.</p>
       </article>
 
     </div>
