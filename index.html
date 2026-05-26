@@ -397,7 +397,10 @@ section { position:relative; z-index:3; }
 ============================================================ */
 .project-grid {
   display:grid; gap:28px;
-  grid-template-columns:1fr 1fr;     /* 50/50 — two real cards split the row */
+  grid-template-columns:repeat(3, 1fr);  /* three real cards across the row */
+}
+@media (max-width:1100px) {
+  .project-grid { grid-template-columns:1fr 1fr; }   /* tablet: 2-up, 3rd wraps */
 }
 .project-card {
   position:relative;
@@ -1279,6 +1282,31 @@ section { position:relative; z-index:3; }
           </ul>
         </div>
         <a class="card-link" href="https://github.com/Kev868/HomePOD" target="_blank" rel="noopener">View on GitHub <span class="arrow">→</span></a>
+      </article>
+
+      <!-- PROJECT 03 — Tim Hortons AI Customer Care -->
+      <article class="project-card">
+        <div class="card-visual">
+          <img class="project-image"
+               src="projects/tim-hortons-ai.png"
+               alt="Screenshot of the Tim Hortons AI customer care agent responding in brand voice with tool-call trace"
+               width="1491" height="1348"
+               loading="lazy" decoding="async"
+               data-caption="Tim Hortons AI Customer Care">
+        </div>
+        <div class="card-body">
+          <span class="card-index">Project 03</span>
+          <h3 class="card-title">Tim Hortons AI</h3>
+          <div class="card-stack"><span>Next.js</span><span>·</span><span>TypeScript</span><span>·</span><span>OpenAI</span><span>·</span><span>RAG</span></div>
+          <p class="card-prose">An AI customer service agent that takes action on the customer's behalf (lookup account, check rewards balance, restore points, issue a perk) in Tim Hortons brand voice. Hand-built agent loop and streaming protocol, custom RAG over a curated FAQ corpus, and an LLM-as-judge eval harness.</p>
+          <ul class="card-bullets">
+            <li>Hand-written agent loop and NDJSON streaming protocol; no LangChain, no Pinecone, no Vercel AI SDK</li>
+            <li>Tool calls for live customer actions: account lookup, rewards balance, points restoration, perk issuance</li>
+            <li>Cosine-similarity RAG over 25 hand-curated FAQ entries using text-embedding-3-small</li>
+            <li>LLM-as-judge eval harness across 10 scripted scenarios; 100% pass rate on the gpt-4o configuration</li>
+          </ul>
+        </div>
+        <a class="card-link" href="https://github.com/Kev868/timhortonsai" target="_blank" rel="noopener">View on GitHub <span class="arrow">→</span></a>
       </article>
 
       <!-- PROJECT 03 — PLACEHOLDER (replace when next project lands)
