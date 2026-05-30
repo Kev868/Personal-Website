@@ -764,12 +764,11 @@ section { position:relative; z-index:3; }
   padding:14px 24px;
   font-family:var(--font-mono); font-size:.78rem; font-weight:500;
   letter-spacing:.18em; text-transform:uppercase; color:var(--fg);
-  border:1px solid var(--rule); border-radius:var(--r-pill);
-  background:var(--glass-bright);
-  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
-  transition:transform var(--dur) var(--ease-water), border-color var(--dur) var(--ease-water), color var(--dur) var(--ease-water);
+  border:1px solid rgba(202,212,224,.14); border-radius:var(--r-pill);
+  background:#13233f;
+  transition:transform var(--dur) var(--ease-water), border-color var(--dur) var(--ease-water), color var(--dur) var(--ease-water), background var(--dur) var(--ease-water);
 }
-.contact-btn:hover { transform:translateY(-3px); border-color:var(--electric); color:var(--bolt); }
+.contact-btn:hover { transform:translateY(-3px); border-color:var(--electric); color:var(--bolt); background:#1a2e4f; }
 .contact-btn svg { width:18px; height:18px; }
 
 /* ============================================================
@@ -1217,12 +1216,12 @@ section { position:relative; z-index:3; }
   font-family:var(--font-mono); font-size:.74rem; font-weight:500;
   letter-spacing:.22em; text-transform:uppercase; color:#0c2c4d;
   padding:14px 28px; border-radius:var(--r-pill);
-  border:1.5px solid rgba(12,44,77,.4); background:rgba(255,255,255,.32);
-  backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);
+  border:1.5px solid rgba(12,44,77,.35); background:#eef6fc;
+  box-shadow:0 6px 18px rgba(12,44,77,.16);
   transition:transform var(--dur) var(--ease-water), border-color var(--dur), background var(--dur);
   animation:fadeUp 1s var(--ease-water) .7s both;
 }
-.dive-btn:hover { transform:translateY(-2px); border-color:#0c2c4d; background:rgba(255,255,255,.5); }
+.dive-btn:hover { transform:translateY(-2px); border-color:#0c2c4d; background:#ffffff; }
 .dive-btn .arr { font-size:1.1em; animation:diveBob 1.8s var(--ease-water) infinite; }
 @keyframes diveBob { 0%,100% { transform:translateY(0); } 50% { transform:translateY(4px); } }
 
@@ -1233,9 +1232,8 @@ section { position:relative; z-index:3; }
   font-family:var(--font-mono); font-size:.66rem; font-weight:500;
   letter-spacing:.18em; text-transform:uppercase; color:var(--fg-strong);
   padding:11px 18px; border-radius:var(--r-pill);
-  background:rgba(6,13,31,.6); border:1px solid var(--rule-bright);
-  backdrop-filter:blur(14px) saturate(140%); -webkit-backdrop-filter:blur(14px) saturate(140%);
-  box-shadow:0 4px 24px rgba(2,6,15,.5), 0 0 16px rgba(93,217,245,.15);
+  background:#101f38; border:1px solid var(--rule-bright);
+  box-shadow:0 6px 22px rgba(2,6,15,.55), 0 0 14px rgba(93,217,245,.12);
   opacity:0; transform:translateY(14px) scale(.96); pointer-events:none;
   transition:opacity var(--dur) var(--ease-water), transform var(--dur) var(--ease-water);
 }
@@ -1347,12 +1345,13 @@ body.submerged .surface-pill { opacity:1; transform:translateY(0) scale(1); poin
   opacity:var(--scrim-op); transition:opacity .4s linear; pointer-events:none;
 }
 
-/* Cards read as darker glass so light copy stays legible at every depth,
-   including the brighter shallow water near the surface. */
+/* Matte panels — solid (no see-through glass), with a faint top-down
+   tonal shift instead of a gloss, so they read as substantial objects
+   sitting in the water at every depth. */
 .project-card, .pcb-card, .ach-card {
-  background:rgba(7,16,33,.4);
-  backdrop-filter:blur(7px) saturate(130%);
-  -webkit-backdrop-filter:blur(7px) saturate(130%);
+  background:linear-gradient(180deg, #15243f 0%, #0e1b31 100%);
+  backdrop-filter:none; -webkit-backdrop-filter:none;
+  border-color:rgba(202,212,224,.12);
 }
 
 /* ---- DEPTH-AWARE NAV TINT ----------------------------------------------- */
