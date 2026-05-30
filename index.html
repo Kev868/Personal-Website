@@ -1158,7 +1158,7 @@ section { position:relative; z-index:3; }
   position:absolute; left:0; right:0; bottom:-1px; height:clamp(130px,19vh,190px);
   z-index:3; overflow:hidden;
   background:linear-gradient(180deg,
-    #d6eefe 0%, #a9d8f4 14%, #7cbfea 38%, #5aa6db 68%, #4a90cf 100%);
+    #dcf0fe 0%, #aedcf7 14%, #80c6f0 38%, #56a9e2 66%, #4197d8 100%);
 }
 .sea-surface::before {                       /* bright horizon seam */
   content:""; position:absolute; left:0; right:0; top:0; height:2px;
@@ -1177,18 +1177,26 @@ section { position:relative; z-index:3; }
   animation:ripDrift ease-in-out infinite alternate, ripFade ease-in-out infinite;
   will-change:transform,opacity;
 }
-@keyframes ripDrift { from { transform:translate(-15%, -2px); } to { transform:translate(15%, 2px); } }
-@keyframes ripFade  { 0%,100% { opacity:.14; } 50% { opacity:.64; } }
-/* A broad soft light sweeping across the surface — motion you can read
-   even from afar, like sun moving over open water. */
+@keyframes ripDrift { from { transform:translate(-18%, -3px); } to { transform:translate(18%, 3px); } }
+@keyframes ripFade  { 0%,100% { opacity:.16; } 50% { opacity:.74; } }
+/* Two broad soft lights sweeping across the surface in opposite
+   directions — open-water motion you can read even from afar. */
 .sea-glimmer {
   position:absolute; inset:0; pointer-events:none; mix-blend-mode:screen;
-  background:linear-gradient(90deg, transparent 0%, rgba(255,255,255,.12) 46%,
-            rgba(255,255,255,.22) 50%, rgba(255,255,255,.12) 54%, transparent 100%);
-  background-size:55% 100%; background-repeat:no-repeat;
-  animation:glimmerSweep 9s ease-in-out infinite alternate;
+  background:linear-gradient(90deg, transparent 0%, rgba(255,255,255,.16) 46%,
+            rgba(255,255,255,.3) 50%, rgba(255,255,255,.16) 54%, transparent 100%);
+  background-size:48% 100%; background-repeat:no-repeat;
+  animation:glimmerSweep 7s ease-in-out infinite alternate;
 }
-@keyframes glimmerSweep { from { background-position:-25% 0; } to { background-position:125% 0; } }
+.sea-glimmer::before {
+  content:""; position:absolute; inset:0; mix-blend-mode:screen;
+  background:linear-gradient(90deg, transparent 0%, rgba(214,238,255,.12) 48%,
+            rgba(214,238,255,.22) 50%, rgba(214,238,255,.12) 52%, transparent 100%);
+  background-size:34% 100%; background-repeat:no-repeat;
+  animation:glimmerSweep2 11s ease-in-out infinite alternate;
+}
+@keyframes glimmerSweep  { from { background-position:-25% 0; } to { background-position:125% 0; } }
+@keyframes glimmerSweep2 { from { background-position:120% 0; } to { background-position:-20% 0; } }
 .sun-path {
   position:absolute; top:0; bottom:0; right:10%; width:clamp(70px,10vw,150px);
   background:linear-gradient(180deg, rgba(255,241,205,.6), rgba(255,236,190,.16) 55%, transparent 85%);
@@ -1368,7 +1376,7 @@ body.at-surface .nav-links a:hover { color:#0a6c84; }
 @media (prefers-reduced-motion: reduce) {
   .sun, .cloud, .dive-btn, .dive-btn .arr, .surface-pill .arr,
   .fish, .kelp, .mote, .godrays, .sealife,
-  .sea-ripples .rip, .sun-path, .sea-glimmer { animation:none !important; }
+  .sea-ripples .rip, .sun-path, .sea-glimmer, .sea-glimmer::before { animation:none !important; }
   .plunge { display:none !important; }
   .fish, .school { opacity:calc(var(--fish-op) * .8); }
 }
@@ -2247,8 +2255,8 @@ body.at-surface .nav-links a:hover { color:#0a6c84; }
     // Starts at the sea-surface blue (continuous with the hero's water
     // band) and darkens monotonically to the abyss — no pale step.
     const STOPS = [
-      [0.00,[74,144,207]], [0.12,[54,118,182]], [0.26,[38,95,160]],
-      [0.40,[28,74,134]],  [0.52,[22,55,104]],  [0.66,[15,35,72]],
+      [0.00,[65,151,216]], [0.12,[48,124,190]], [0.26,[34,98,164]],
+      [0.40,[26,76,136]],  [0.52,[21,56,106]],  [0.66,[15,35,72]],
       [0.80,[10,20,48]],   [0.90,[6,13,31]],     [1.00,[2,6,15]]
     ];
     function sample(t){
