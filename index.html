@@ -1151,14 +1151,44 @@ section { position:relative; z-index:3; }
   filter:blur(6px); opacity:.72; z-index:1;
 }
 
-/* Animated waterline where the sky meets the sea, pinned to hero bottom.
-   Two full-width (200%) tiling SVGs translated by exactly one tile
-   (-50%) so the loop is perfectly seamless — no mid-cut. */
-.waterline { position:absolute; left:0; right:0; bottom:-2px; width:100%; height:130px; z-index:3; overflow:hidden; }
-.waterline .wl { position:absolute; left:0; bottom:0; width:200%; height:100%; will-change:transform; }
-.waterline .wl-body { animation:waveSlide 26s linear infinite; }
-.waterline .wl-foam { animation:waveSlide 18s linear infinite; }
-@keyframes waveSlide { from { transform:translate3d(0,0,0); } to { transform:translate3d(-50%,0,0); } }
+/* Calm reflective sea at the horizon. A real distant ocean surface is
+   nearly flat — so instead of wave humps this is a flat water plane with
+   a bright horizon seam, slow drifting ripple highlights, and a
+   shimmering sun-glitter column beneath the sun. */
+.sea-surface {
+  position:absolute; left:0; right:0; bottom:-1px; height:clamp(130px,19vh,190px);
+  z-index:3; overflow:hidden;
+  background:linear-gradient(180deg,
+    #d6eefe 0%, #a9d8f4 16%, #7cbfea 42%, #58a6da 72%, #4795cf 100%);
+}
+.sea-surface::before {                       /* bright horizon seam */
+  content:""; position:absolute; left:0; right:0; top:0; height:2px;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.95), transparent);
+  filter:blur(.5px);
+}
+.sea-surface::after {                         /* haze fading down from horizon */
+  content:""; position:absolute; left:0; right:0; top:0; height:42%;
+  background:linear-gradient(180deg, rgba(255,255,255,.32), transparent);
+}
+.sea-ripples { position:absolute; inset:0; }
+.sea-ripples .rip {
+  position:absolute; left:-20%; width:140%; height:2px; border-radius:50%;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.5), transparent);
+  filter:blur(.6px); opacity:.2;
+  animation:ripDrift linear infinite alternate, ripFade ease-in-out infinite;
+  will-change:transform,opacity;
+}
+@keyframes ripDrift { from { transform:translateX(-8%); } to { transform:translateX(8%); } }
+@keyframes ripFade  { 0%,100% { opacity:.1; } 50% { opacity:.5; } }
+.sun-path {
+  position:absolute; top:0; bottom:0; right:10%; width:clamp(70px,10vw,150px);
+  background:linear-gradient(180deg, rgba(255,241,205,.6), rgba(255,236,190,.16) 55%, transparent 85%);
+  -webkit-mask:repeating-linear-gradient(90deg, #000 0 2px, transparent 2px 7px);
+          mask:repeating-linear-gradient(90deg, #000 0 2px, transparent 2px 7px);
+  filter:blur(.6px); mix-blend-mode:screen;
+  animation:glint 2.6s ease-in-out infinite alternate;
+}
+@keyframes glint { from { opacity:.5; transform:translateX(-2px); } to { opacity:.95; transform:translateX(2px); } }
 
 /* Hero content */
 .sky-inner { position:relative; z-index:5; max-width:1100px; }
@@ -1329,7 +1359,7 @@ body.at-surface .nav-links a:hover { color:#0a6c84; }
 @media (prefers-reduced-motion: reduce) {
   .sun, .cloud, .dive-btn, .dive-btn .arr, .surface-pill .arr,
   .fish, .kelp, .mote, .godrays, .sealife,
-  .waterline .wl-foam, .waterline .wl-body { animation:none !important; }
+  .sea-ripples .rip, .sun-path { animation:none !important; }
   .plunge { display:none !important; }
   .fish, .school { opacity:calc(var(--fish-op) * .8); }
 }
@@ -1487,14 +1517,16 @@ body.at-surface .nav-links a:hover { color:#0a6c84; }
     <div class="cloud cloud--2"></div>
     <div class="cloud cloud--3"></div>
     <div class="beach"></div>
-    <!-- Waterline: two full-width tiling SVGs that loop seamlessly -->
-    <div class="waterline">
-      <svg class="wl wl-body" viewBox="0 0 4800 130" preserveAspectRatio="none">
-        <path d="M0,58 C300,30 600,30 1200,58 C1800,86 2100,86 2400,58 L2400,130 L0,130 Z M2400,58 C2700,30 3000,30 3600,58 C4200,86 4500,86 4800,58 L4800,130 L2400,130 Z" fill="#6fb3e6" opacity="0.9"></path>
-      </svg>
-      <svg class="wl wl-foam" viewBox="0 0 4800 130" preserveAspectRatio="none">
-        <path d="M0,50 C300,26 600,26 1200,50 C1800,74 2100,74 2400,50 L2400,66 L0,66 Z M2400,50 C2700,26 3000,26 3600,50 C4200,74 4500,74 4800,50 L4800,66 L2400,66 Z" fill="#eafaff" opacity="0.85"></path>
-      </svg>
+    <!-- Calm reflective sea: flat horizon with ripples + sun glitter -->
+    <div class="sea-surface">
+      <div class="sun-path"></div>
+      <div class="sea-ripples">
+        <span class="rip" style="top:16%;            animation-duration:9s,5s;   animation-delay:0s,-1s;"></span>
+        <span class="rip" style="top:28%;            animation-duration:11s,6s;  animation-delay:-2s,-2s;"></span>
+        <span class="rip" style="top:42%; height:3px; animation-duration:8s,4.5s; animation-delay:-1s,-3s;"></span>
+        <span class="rip" style="top:60%; height:3px; animation-duration:12s,5.5s;animation-delay:-3s,-1.5s;"></span>
+        <span class="rip" style="top:80%; height:4px; animation-duration:10s,6.5s;animation-delay:-4s,-2.5s;"></span>
+      </div>
     </div>
   </div>
 
