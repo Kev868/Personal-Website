@@ -1239,17 +1239,18 @@ body.submerged .surface-pill { opacity:1; transform:translateY(0) scale(1); poin
 }
 .fish svg { width:100%; height:100%; fill:currentColor; }
 .school .fish { color:#0a1f3a; }
+/* Art faces left, so left->right swimmers are flipped to face their travel. */
 @keyframes fishSwim {
-  from { transform:translateX(-18vw) translateY(0); }
-  50%  { transform:translateX(56vw) translateY(-14px); }
-  to   { transform:translateX(130vw) translateY(0); }
+  from { transform:translateX(-18vw) scaleX(-1) translateY(0); }
+  50%  { transform:translateX(56vw)  scaleX(-1) translateY(-14px); }
+  to   { transform:translateX(130vw) scaleX(-1) translateY(0); }
 }
-/* mirrored swimmers (right -> left) */
+/* mirrored swimmers (right -> left): art already faces left, no flip */
 .fish.rtl { animation-name:fishSwimRTL; }
 @keyframes fishSwimRTL {
-  from { transform:translateX(130vw) scaleX(-1) translateY(0); }
-  50%  { transform:translateX(56vw)  scaleX(-1) translateY(16px); }
-  to   { transform:translateX(-18vw) scaleX(-1) translateY(0); }
+  from { transform:translateX(130vw) translateY(0); }
+  50%  { transform:translateX(56vw)  translateY(16px); }
+  to   { transform:translateX(-18vw) translateY(0); }
 }
 .fish-layer    { opacity:var(--fish-op); transition:opacity .4s linear; }
 .school        { opacity:var(--fish-op); transition:opacity .4s linear; }
