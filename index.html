@@ -794,6 +794,7 @@ section { position:relative; z-index:3; }
 }
 .resume-pdf:hover { transform:translateY(-2px); border-color:var(--electric); color:var(--bolt); }
 .resume-pdf svg { width:16px; height:16px; }
+.resume-pdf-group { display:flex; flex-wrap:wrap; gap:12px; }
 
 /* Contact strip under the title */
 .resume-contact {
@@ -1565,14 +1566,24 @@ section { position:relative; z-index:3; }
         <span class="section-no">06 / Manifest</span>
         <h2 class="section-title">Resume</h2>
       </div>
-      <a class="resume-pdf" href="resume.pdf" download>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M12 4v12"/>
-          <path d="M7 11l5 5 5-5"/>
-          <path d="M5 20h14"/>
-        </svg>
-        Download PDF
-      </a>
+      <div class="resume-pdf-group">
+        <a class="resume-pdf" href="Kevin_Lingfeng_GeResumegeneralhardware.pdf" download>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 4v12"/>
+            <path d="M7 11l5 5 5-5"/>
+            <path d="M5 20h14"/>
+          </svg>
+          General / Hardware
+        </a>
+        <a class="resume-pdf" href="Kevin(Lingfeng)_GeResumeSoftware.pdf" download>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 4v12"/>
+            <path d="M7 11l5 5 5-5"/>
+            <path d="M5 20h14"/>
+          </svg>
+          Software
+        </a>
+      </div>
     </div>
 
     <header class="resume-contact reveal">
@@ -1589,9 +1600,9 @@ section { position:relative; z-index:3; }
     <div class="resume-cat reveal">
       <h3 class="resume-cat-title">Summary of Qualifications</h3>
       <ul class="resume-bullets">
-        <li>Experience in PCB design, HV schematic capture, power systems, custom component design, embedded systems, microcontrollers, and test automation in power electronics applications utilizing various software applications</li>
-        <li>Skilled in various CAD software usage and scripting in Python, C++, C#, VBS, VBA, and HTML to fit custom needs</li>
-        <li>Hardware team designer on University of Waterloo's Midnight Sun solar EV team collaborating with multiple teams, with proven leadership coordinating 110+ volunteers across nonprofit projects raising $2,500+ for charity</li>
+        <li>Experience in PCB design, HV schematic capture, power systems, custom component design, embedded systems, microcontrollers, and test automation, alongside full-stack web development, real-time simulation engines, and AI agent design with LLM function calling and RAG; available September to December 2026</li>
+        <li>Proficient in Python, TypeScript, JavaScript, C#, C++, React, Next.js, VBA, and AI coding tools (Claude Code, Codex), with skilled use of various CAD software and scripting to fit custom needs</li>
+        <li>Hardware team designer on University of Waterloo's Midnight Sun solar EV team collaborating across hardware and software domains, with proven leadership coordinating 110+ volunteers across nonprofit projects raising $2,500+ for charity</li>
       </ul>
     </div>
 
@@ -1616,7 +1627,7 @@ section { position:relative; z-index:3; }
       <article class="resume-entry">
         <div class="resume-meta">
           <div class="rm-primary">
-            <h4 class="resume-entry-title">Electrical Engineering Design Co-op</h4>
+            <h4 class="resume-entry-title">Engineering Design Co-op</h4>
             <p class="resume-entry-org">S&amp;C Electric</p>
           </div>
           <div class="rm-secondary">
@@ -1626,10 +1637,11 @@ section { position:relative; z-index:3; }
         </div>
         <div class="resume-content">
           <ul class="resume-bullets">
-            <li>Designed new scripts and tools to help automate the design process in CAD software using VBA, VBS, HTML, and C#</li>
-            <li>Developed, maintained, and updated legacy code systems to reintroduce outdated tools back into the workflow</li>
+            <li>Engineered C#, VBA, VBS, and HTML automation tooling to streamline engineering design workflows across the team</li>
+            <li>Refactored legacy codebases by resolving COM API integration issues and rewriting Bill of Materials and wiring report generation logic, restoring deprecated CAD tools to active production use across the design team</li>
             <li>Utilized E3 and Microstation to draw single line and 3 line schematics for custom HV electrical components</li>
-            <li>Leveraged and created Excel and 3DX macros to efficiently store and retrieve data within large datasets and libraries</li>
+            <li>Built data parsing scripts using regex and natural-sort algorithms to produce structured component library outputs</li>
+            <li>Authored Excel and 3DX macros for data storage and retrieval across enterprise component libraries</li>
             <li>Created educational documents for the team to better understand modern electrical codes such as IEC 61850</li>
           </ul>
         </div>
@@ -1672,10 +1684,9 @@ section { position:relative; z-index:3; }
         </div>
         <div class="resume-content">
           <ul class="resume-bullets">
-            <li>Designed and simulated multiple 2-layer PCBs with schematic integration and optimized component placement</li>
-            <li>Utilised custom libraries and conducted DRCs to ensure compliance with safety and manufacturing standards</li>
-            <li>Enhanced circuit efficiency through component selection, power calculations, and manufacturability considerations</li>
-            <li>Documented design process and safety considerations in technical reports for future iterations and team knowledge transfer</li>
+            <li>Designed and simulated multiple 2-layer PCBs — including buck converter, lighting, and current sense boards — with schematic integration, custom libraries, and DRC compliance against safety and manufacturing standards</li>
+            <li>Selected components and ran power-budget calculations to enhance circuit efficiency, signal integrity, and manufacturability</li>
+            <li>Documented design process, safety considerations, and validation results in technical reports to support cross-team handoff and future iterations</li>
           </ul>
         </div>
       </article>
@@ -1684,6 +1695,33 @@ section { position:relative; z-index:3; }
     <!-- Projects -->
     <div class="resume-cat reveal">
       <h3 class="resume-cat-title">Projects</h3>
+
+      <article class="resume-entry">
+        <div class="resume-meta">
+          <div class="rm-primary">
+            <h4 class="resume-entry-title">Tim Hortons AI Customer Care</h4>
+          </div>
+          <div class="rm-secondary">
+            <p class="resume-entry-when">May 2026</p>
+          </div>
+        </div>
+        <div class="resume-content">
+          <div class="resume-tech">
+            <span class="resume-tech-tag">TypeScript</span>
+            <span class="resume-tech-tag">Next.js</span>
+            <span class="resume-tech-tag">React</span>
+            <span class="resume-tech-tag">OpenAI</span>
+            <span class="resume-tech-tag">Together AI</span>
+            <span class="resume-tech-tag">LoRA</span>
+          </div>
+          <ul class="resume-bullets">
+            <li>Built and deployed a production AI customer service agent for Tim Hortons in Next.js 16, React 19, and TypeScript, implementing a hand-rolled multi-turn agent loop with NDJSON streaming over fetch and no LangChain or Vercel AI SDK</li>
+            <li>Engineered a custom RAG pipeline using OpenAI text-embedding-3-small with cosine similarity over a curated FAQ corpus, paired with four function-calling tools for account lookup, rewards balance, points restoration, and perk issuance</li>
+            <li>Built an LLM-as-judge eval harness with gpt-4o-mini scoring agent runs across 10 multi-turn scenarios, iterating the system prompt to reach 100% tool-use accuracy and perfect voice consistency</li>
+            <li>Fine-tuned Llama-3.1-70B-Instruct via LoRA on Together AI; diagnosed an inference-time tool-format mismatch between OpenAI JSON and Llama python-tag tokens, then shipped gpt-4o to production</li>
+          </ul>
+        </div>
+      </article>
 
       <article class="resume-entry">
         <div class="resume-meta">
@@ -1723,17 +1761,17 @@ section { position:relative; z-index:3; }
         <div class="resume-content">
           <div class="resume-tech">
             <span class="resume-tech-tag">TypeScript</span>
+            <span class="resume-tech-tag">React</span>
             <span class="resume-tech-tag">Python</span>
             <span class="resume-tech-tag">Claude Code</span>
             <span class="resume-tech-tag">Codex</span>
-            <span class="resume-tech-tag">React</span>
             <span class="resume-tech-tag">Power Systems</span>
           </div>
           <ul class="resume-bullets">
-            <li>Developed a browser-based Automatic Transfer Switch simulator using React and TypeScript, featuring a graph-based circuit engine that computes energization paths, breaker state logic, and open/closed/fast transfer sequences in real time</li>
-            <li>Engineered a CAD-style topology editor with snap-to-grid placement, orthogonal wire routing, and port-aware rotation</li>
-            <li>Optimized engine to decouple simulation time from clock time, supporting playback speed from 0.05x to 5x</li>
-            <li>Implemented a connectivity solver using BFS flood-fill to model breaker interlock logic, sync-check gating, undervoltage pickup delays, and automatic retransfer sequencing</li>
+            <li>Built a browser-based Automatic Transfer Switch simulator in React and TypeScript featuring a graph-based circuit engine that computes energization paths, breaker state logic, and open/closed/fast transfer sequences in real time</li>
+            <li>Implemented a BFS flood-fill connectivity solver to model breaker interlock logic, sync-check gating, undervoltage pickup delays, automatic retransfer sequencing, and bus-level energization across primary and backup sources</li>
+            <li>Engineered a CAD-style topology editor with snap-to-grid placement, orthogonal wire routing, and port-aware rotation, decoupling simulation time from clock time to support variable playback speeds from 0.05x to 5x</li>
+            <li>Integrated AI coding tools (Claude Code, Codex) for architecture review, refactoring, and faster iteration</li>
           </ul>
         </div>
       </article>
@@ -1743,6 +1781,39 @@ section { position:relative; z-index:3; }
     <div class="resume-cat reveal">
       <h3 class="resume-cat-title">Technical Skills</h3>
       <div class="resume-skills">
+
+        <div class="resume-skill-group">
+          <h4 class="resume-skill-label">Programming</h4>
+          <div class="resume-chips">
+            <span class="resume-chip">Python</span>
+            <span class="resume-chip">TypeScript</span>
+            <span class="resume-chip">JavaScript</span>
+            <span class="resume-chip">C#</span>
+            <span class="resume-chip">C++</span>
+            <span class="resume-chip">C</span>
+            <span class="resume-chip">VBA</span>
+            <span class="resume-chip">VBScript</span>
+            <span class="resume-chip">SQL</span>
+            <span class="resume-chip">HTML</span>
+            <span class="resume-chip">CSS</span>
+          </div>
+        </div>
+
+        <div class="resume-skill-group">
+          <h4 class="resume-skill-label">Frameworks &amp; Tools</h4>
+          <div class="resume-chips">
+            <span class="resume-chip">React</span>
+            <span class="resume-chip">Next.js</span>
+            <span class="resume-chip">Node.js</span>
+            <span class="resume-chip">Tailwind</span>
+            <span class="resume-chip">Git</span>
+            <span class="resume-chip">OpenAI API</span>
+            <span class="resume-chip">RAG</span>
+            <span class="resume-chip">LoRA fine-tuning</span>
+            <span class="resume-chip">Claude Code</span>
+            <span class="resume-chip">Codex</span>
+          </div>
+        </div>
 
         <div class="resume-skill-group">
           <h4 class="resume-skill-label">Hardware / Design</h4>
@@ -1757,33 +1828,15 @@ section { position:relative; z-index:3; }
         </div>
 
         <div class="resume-skill-group">
-          <h4 class="resume-skill-label">Programming</h4>
-          <div class="resume-chips">
-            <span class="resume-chip">Python</span>
-            <span class="resume-chip">C++</span>
-            <span class="resume-chip">C#</span>
-            <span class="resume-chip">C</span>
-            <span class="resume-chip">VBScript</span>
-            <span class="resume-chip">VBA</span>
-            <span class="resume-chip">ML pipeline</span>
-            <span class="resume-chip">HTML</span>
-            <span class="resume-chip">JavaScript</span>
-            <span class="resume-chip">Claude</span>
-            <span class="resume-chip">Codex</span>
-            <span class="resume-chip">CSS</span>
-            <span class="resume-chip">React</span>
-            <span class="resume-chip">SQL</span>
-          </div>
-        </div>
-
-        <div class="resume-skill-group">
           <h4 class="resume-skill-label">Software</h4>
           <div class="resume-chips">
-            <span class="resume-chip">Microsoft Office (Excel, Word, PowerPoint)</span>
-            <span class="resume-chip">Arduino Uno</span>
-            <span class="resume-chip">SharePoint</span>
-            <span class="resume-chip">Teams</span>
+            <span class="resume-chip">Microsoft Office (Excel, Word, PowerPoint, Teams)</span>
+            <span class="resume-chip">Vercel</span>
+            <span class="resume-chip">Arduino</span>
+            <span class="resume-chip">GIS</span>
+            <span class="resume-chip">PLS CADD Suite</span>
             <span class="resume-chip">Claude Agents</span>
+            <span class="resume-chip">SharePoint</span>
           </div>
         </div>
 
