@@ -1,0 +1,1062 @@
+/* ============================================================
+   THE PALACE IN THE CLOUDS — kevinge.com
+
+   The page is a walk along a palace's central axis, set in the heavens:
+   the Southern Heavenly Gate, a pair of doors, two halls, the library and
+   the bell tower. The sky behind it all moves through one day as you go.
+
+   Kept from the parchment site, on purpose: the banner, the seal, the
+   seigaiha waves (now the texture of the sky), the parchment (now the paper
+   of every scroll and edict), the brocade band, and the rule that nothing
+   is rounded. UI corners are chamfers, hexagons and diamonds; only
+   architecture and ornament (studs, lanterns, clouds) are allowed curves.
+============================================================ */
+
+/* ============================================================
+   1.  TOKENS
+============================================================ */
+:root {
+  /* Paper and ink, unchanged from the parchment site */
+  --paper:#f0e6cc;
+  --paper-2:#e8d9b6;
+  --paper-3:#f6eed8;
+  --ink:#241a0d;
+  --ink-2:#362b1c;
+  --ink-muted:#6b5a3f;
+  --ink-dim:#9a876a;
+  --line:rgba(60,45,25,.22);
+  --cinnabar:#a63328;              /* the seal's red: accents, not surfaces */
+
+  /* The palace, from the reference photographs */
+  --vermilion:#b8261e;             /* walls and pillars */
+  --vermilion-deep:#6e100b;
+  --gold:#c9a24a;                  /* glaze, gilt, the only light on dark */
+  --gold-hi:#ecd28a;
+  --gold-deep:#8a6420;
+  --lacquer:#170f0c;
+  --lacquer-2:#271812;
+  --lacquer-3:#3a2418;
+  --jade:#2e8b7a;                  /* painted brackets */
+  --jade-deep:#0f2621;
+  --lapis:#1f3f7a;                 /* plaques only */
+  --lapis-deep:#132a55;
+  --marble:#efe9dd;
+  --cream:#f4ead2;                 /* text on dark */
+  --cream-muted:#cbbc9c;
+
+  /* The sky. js/sky.js tweens these through the day. */
+  --sky-top:#e7c595;
+  --sky-mid:#f3dcb6;
+  --sky-low:#fbf1dc;
+  --sun:rgba(255,232,178,.95);
+  --sun-y:34%;
+  --stars:0;
+  --wave:rgba(201,162,74,.16);
+  --cloud-b:1;                     /* clouds dim with the light */
+
+  /* Type — pairing A. Swap all four with ?type=b|c|today (js/type.js). */
+  --font-display:'Cormorant Garamond','Spectral',Georgia,serif;
+  --font-brush:'Zhi Mang Xing','Ma Shan Zheng','KaiTi','STKaiti',serif;
+  --font-giant:'Liu Jian Mao Cao','Zhi Mang Xing','Ma Shan Zheng',serif;
+  --font-body:'Spectral',Georgia,'Times New Roman',serif;
+  --display-weight:500;
+
+  /* Rhythm */
+  --nav-h:62px;
+  --maxw:1320px;
+  --gutter:clamp(18px,5vw,64px);
+  --pillar-w:clamp(26px,3.4vw,58px);
+
+  /* Shapes. No radius tokens: see the header note. */
+  --hex-wide:polygon(9px 0, calc(100% - 9px) 0, 100% 50%, calc(100% - 9px) 100%, 9px 100%, 0 50%);
+  --hex-gem:polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  --oct-cut:7px;
+  --oct:polygon(var(--oct-cut) 0, calc(100% - var(--oct-cut)) 0, 100% var(--oct-cut), 100% calc(100% - var(--oct-cut)), calc(100% - var(--oct-cut)) 100%, var(--oct-cut) 100%, 0 calc(100% - var(--oct-cut)), 0 var(--oct-cut));
+  --oct-cut-lg:22px;
+  --oct-lg:polygon(var(--oct-cut-lg) 0, calc(100% - var(--oct-cut-lg)) 0, 100% var(--oct-cut-lg), 100% calc(100% - var(--oct-cut-lg)), calc(100% - var(--oct-cut-lg)) 100%, var(--oct-cut-lg) 100%, 0 calc(100% - var(--oct-cut-lg)), 0 var(--oct-cut-lg));
+  --diamond:polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  /* Traced from bannertouse.png's paper edge; see the parchment site's notes. */
+  --banner:polygon(49% 4.6%, 75% 19.5%, 75% 83.5%, 49.6% 94.2%, 24.6% 82.8%, 24.6% 18.2%);
+
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --dur:320ms;
+
+  /* Roofs: imperial yellow glaze, warm as on the Forbidden City's halls,
+     unless a scene sets its own. */
+  --tile-base:#e0a034; --tile-dark:#7a480e; --tile-light:#fcd67c; --ridge:#6b4210;
+
+  /* Weathering (tools/build_textures.py): laid over painted and lacquered
+     surfaces so they read as old work, not print. */
+  --wear:url("../assets/gen/wear.webp") 0 0 / 300px 300px repeat;
+  --lacquer-wear:url("../assets/gen/lacquer.webp") 0 0 / 150px 450px repeat;
+
+  /* Lanterns */
+  --lantern:#c2261c; --lantern-rib:#8e1812; --lantern-core:#ffcf7a;
+}
+
+/* The other pairings, for comparison. Fonts load on demand in js/type.js. */
+:root[data-type="b"] {
+  --font-display:'Yuji Syuku','Ma Shan Zheng','Spectral',serif;
+  --font-brush:'Ma Shan Zheng','KaiTi',serif;
+  --font-giant:'Ma Shan Zheng','KaiTi',serif;
+  --display-weight:400;
+}
+/* Yuji's letters run wide; at the default size the name breaks onto three lines. */
+:root[data-type="b"] .gate-name { font-size:clamp(2.6rem,5vw,4.8rem); }
+:root[data-type="c"] {
+  --font-display:'Ma Shan Zheng','Spectral',cursive;
+  --font-brush:'Ma Shan Zheng','KaiTi',serif;
+  --font-giant:'Liu Jian Mao Cao','Ma Shan Zheng',serif;
+  --display-weight:400;
+}
+:root[data-type="today"] {
+  --font-display:'Ma Shan Zheng','Spectral',cursive;
+  --font-brush:'Ma Shan Zheng','KaiTi',serif;
+  --font-giant:'Ma Shan Zheng','KaiTi',serif;
+  --display-weight:400;
+}
+
+/* Registered so the gilt ring on a work card can fade its colour. */
+@property --ring { syntax:'<color>'; inherits:false; initial-value:rgba(201,162,74,.28); }
+
+/* ============================================================
+   2.  RESET + BASE
+============================================================ */
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html { -webkit-text-size-adjust:100%; background:var(--sky-low); }
+/* Lenis drives the scroll when it runs; native smooth scroll would fight it. */
+html.lenis, html.lenis body { height:auto; }
+html:not(.lenis) { scroll-behavior:smooth; }
+body {
+  font-family:var(--font-body); font-weight:400; font-size:1.02rem; line-height:1.62;
+  color:var(--ink-2); overflow-x:hidden;
+}
+img,svg { display:block; max-width:100%; }
+a { color:inherit; text-decoration:none; }
+button { font:inherit; color:inherit; background:none; border:0; cursor:pointer; }
+::selection { background:var(--cinnabar); color:var(--paper); }
+:focus-visible { outline:2px solid var(--gold); outline-offset:3px; }
+[hidden] { display:none !important; }
+
+.sprite { position:absolute; width:0; height:0; overflow:hidden; }
+.wrap { max-width:var(--maxw); margin:0 auto; padding-inline:var(--gutter); }
+/* Clouds run 120% wide so they can drift; clip them sideways (never
+   vertically, where they overlap scenes on purpose). Without this, phones
+   widen the whole layout to fit them, and every fixed layer, the nav
+   included, stretches past the edge of the screen. */
+main { position:relative; z-index:1; overflow-x:clip; }
+.is-locked body { overflow:hidden; }
+
+.eyebrow {
+  display:inline-block;
+  font-size:.74rem; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--cinnabar);
+}
+.eyebrow [lang] { font-family:var(--font-brush); font-size:1.05rem; letter-spacing:.08em; text-transform:none; }
+
+/* ============================================================
+   3.  THE HEAVENS  (fixed, behind everything)
+============================================================ */
+.sky { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+.sky-glow {
+  position:absolute; inset:0;
+  background:
+    radial-gradient(ellipse 58% 42% at 52% var(--sun-y), var(--sun) 0%, transparent 72%),
+    linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 52%, var(--sky-low) 100%);
+}
+.sky-stars { position:absolute; inset:0; width:100%; height:100%; opacity:var(--stars); }
+/* Seigaiha, the parchment site's ground, repainted as a sea of cloud. */
+.sky-waves {
+  position:absolute; inset:0;
+  background-image:
+    radial-gradient(circle at 100% 150%, transparent 24%, var(--wave) 24.6%, var(--wave) 26.2%, transparent 26.8%, transparent 36%, var(--wave) 36.6%, var(--wave) 38.2%, transparent 38.8%),
+    radial-gradient(circle at 0 150%, transparent 24%, var(--wave) 24.6%, var(--wave) 26.2%, transparent 26.8%, transparent 36%, var(--wave) 36.6%, var(--wave) 38.2%, transparent 38.8%),
+    radial-gradient(circle at 50% 100%, var(--wave) 9%, transparent 9.6%, transparent 23%, var(--wave) 23.6%, var(--wave) 25.2%, transparent 25.8%, transparent 43%, var(--wave) 43.6%, var(--wave) 45.2%, transparent 45.8%, transparent 63%, var(--wave) 63.6%, var(--wave) 65.2%, transparent 65.8%);
+  background-size:120px 60px;
+  -webkit-mask-image:linear-gradient(to bottom, transparent 0%, #000 60%);
+          mask-image:linear-gradient(to bottom, transparent 0%, #000 60%);
+}
+.sky-isles { position:absolute; left:0; right:0; bottom:0; height:46vh; }
+/* The far heavens: a sea of cloud with the palace's distant towers standing
+   in it. Faint and greyed, as distance makes things, so it stays behind the
+   words in front of it. */
+.far-heavens { position:absolute; left:-6%; bottom:-3vh; width:112%; max-width:none; opacity:.42; filter:brightness(var(--cloud-b)) saturate(.55) contrast(.85); }
+/* Clouds are lit by whatever time it is. */
+.cloud, .xiangyun, .arch-foot { filter:brightness(var(--cloud-b)); }
+
+/* ============================================================
+   4.  NAV
+   The parchment strip and the red brocade "heaven band" a hanging scroll
+   is mounted with: the site's oldest furniture, kept as it was.
+============================================================ */
+.nav {
+  position:fixed; top:0; left:0; right:0; z-index:60;
+  background:var(--paper) url("../assets/bg/silk-ground.png") repeat;
+  background-size:408px 87px;
+}
+.nav::after {
+  content:""; position:absolute; left:0; right:0; bottom:0; height:6px;
+  background:url("../assets/bg/silk-band.png") repeat-x; background-size:auto 6px;
+}
+.nav-row {
+  max-width:var(--maxw); margin:0 auto; height:var(--nav-h);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 var(--gutter) 6px;
+}
+.brand { display:inline-flex; align-items:center; gap:10px; font-family:var(--font-display); font-weight:600; font-size:1.4rem; color:var(--ink); }
+.brand-name { white-space:nowrap; }
+.brand .dot { color:var(--cinnabar); }
+.brand-seal { width:27px; height:27px; flex:none; }
+.nav-links { display:flex; gap:26px; list-style:none; align-items:center; }
+.nav-links a, .nav-links button {
+  position:relative; font-size:.82rem; letter-spacing:.06em; color:var(--ink-muted); padding:4px 0;
+}
+.nav-links a::before, .nav-links button::before {
+  content:""; position:absolute; left:-11px; top:50%; width:5px; height:5px; margin-top:-2.5px;
+  background:var(--cinnabar); clip-path:var(--diamond); opacity:0; transition:opacity var(--dur) var(--ease);
+}
+.nav-links a:hover, .nav-links button:hover { color:var(--cinnabar); }
+.nav-links a:hover::before, .nav-links button:hover::before { opacity:1; }
+.sound-toggle { display:inline-flex; align-items:center; gap:6px; }
+/* Until there is sound to play, its slot must not hold a gap in the row. */
+.nav-links li:has(> [hidden]) { display:none; }
+.sound-zh { font-family:var(--font-brush); font-size:1.1rem; line-height:1; }
+.sound-toggle[aria-pressed="true"] { color:var(--cinnabar); }
+@media (max-width:760px) {
+  .nav-links { gap:16px; }
+  .nav-links li:nth-child(4) { display:none; }
+  .sound-en { display:none; }
+}
+@media (max-width:520px) { .nav-links li:nth-child(2) { display:none; } }
+
+/* ============================================================
+   5.  SHARED FURNITURE
+============================================================ */
+/* Buttons: the hexagon pill from the parchment site, plus gold for the dark halls. */
+.btn {
+  display:inline-flex; align-items:center; gap:9px; padding:13px 26px;
+  font-size:.8rem; letter-spacing:.03em;
+  background:var(--paper-2); color:var(--ink-2);
+  clip-path:var(--hex-wide);
+  transition:background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.btn svg { width:16px; height:16px; }
+.btn:hover { background:rgba(166,51,40,.14); color:var(--cinnabar); }
+.btn--solid { background:var(--ink); color:var(--paper); }
+.btn--solid:hover { background:var(--cinnabar); color:#fff; }
+.btn--gold { background:linear-gradient(100deg, #b98a2e, var(--gold-hi) 50%, #b98a2e); color:var(--lacquer); font-weight:600; }
+.btn--gold:hover { background:linear-gradient(100deg, #cfa03c, #fff1c4 50%, #cfa03c); color:var(--lacquer); }
+/* For dark and sunset skies: a smoked panel, so the words hold against
+   whatever colour the sky has reached. */
+.btn--ghost { background:rgba(20,10,8,.42); color:#fff1cf; }
+.btn--ghost:hover { background:rgba(20,10,8,.62); color:#fff; }
+.btn .arrow { transition:transform var(--dur) var(--ease); }
+.btn:hover .arrow { transform:translateX(3px); }
+
+/* Plaques: lapis boards with a gold double frame, as above palace doors. */
+.plaque {
+  position:relative;
+  background:
+    var(--wear),
+    radial-gradient(ellipse 80% 70% at 28% 22%, rgba(255,255,255,.1), transparent 70%),
+    linear-gradient(180deg, #24478a, var(--lapis) 45%, var(--lapis-deep));
+  clip-path:var(--oct);
+  box-shadow:inset 0 0 0 2px var(--gold), inset 0 0 0 5px var(--lapis-deep), inset 0 0 0 6px var(--gold-hi);
+  color:var(--gold-hi);
+}
+.plaque-zh { font-family:var(--font-brush); line-height:1; letter-spacing:.12em; }
+.plaque-en { font-size:.7rem; letter-spacing:.2em; text-transform:uppercase; color:var(--gold); }
+
+/* Pillars: lacquered columns, gilt collars, painted bracket capital, marble foot. */
+.pillar {
+  position:absolute; width:var(--pillar-w);
+  background:
+    var(--lacquer-wear),
+    linear-gradient(180deg, rgba(30,6,4,.34), rgba(30,6,4,.08) 9%, transparent 22%, transparent 72%, rgba(30,6,4,.16)),
+    linear-gradient(90deg, #3c0805 0%, #6f130d 7%, #a8291f 20%, #cf4a39 31%, #e2735c 37%, #d4503e 43%, #b0301f 58%, #8a1d14 74%, #63120c 87%, #561410 94%, #6b1d15 100%);
+}
+/* Plain lacquer up to the beam, as on the real halls, in the beam's shadow;
+   the carved braces in the corner beside it are part of the roof's drawing. */
+.pillar::before {
+  content:""; position:absolute; left:0; right:0; top:0; height:clamp(14px,2vw,30px);
+  background:linear-gradient(180deg, rgba(20,6,4,.55), transparent);
+}
+.pillar::after {
+  content:""; position:absolute; left:-22%; right:-22%; bottom:0; height:clamp(16px,2vw,28px);
+  background:
+    var(--wear),
+    linear-gradient(90deg, rgba(255,255,255,.25), transparent 40%, rgba(60,40,20,.18)),
+    linear-gradient(180deg, #faf6ee, var(--marble) 55%, #cfc6b4);
+  clip-path:polygon(10% 0, 90% 0, 100% 100%, 0 100%);
+}
+
+/* Lanterns hang on a cord from under an eave and sway about its top, which
+   is tucked out of sight behind the roof. --cord lengthens the cord, so
+   lanterns can hang at different heights and still be tied to something. */
+.lantern { width:clamp(34px,3.6vw,58px); filter:drop-shadow(0 0 18px rgba(255,160,70,.45)); }
+.hang {
+  position:relative; display:block; padding-top:calc(var(--cord, 0px) + 14px);
+  transform-origin:50% 0; animation:sway 6.5s ease-in-out infinite alternate;
+}
+.hang::before { content:""; position:absolute; left:calc(50% - 1px); top:0; width:2px; height:calc(var(--cord, 0px) + 15px); background:var(--gold-deep); }
+.hang:nth-child(2) { animation-duration:7.8s; animation-delay:-2s; }
+.hang:nth-child(3) { animation-duration:8.6s; animation-delay:-4s; }
+.hang:nth-child(4) { animation-duration:7.1s; animation-delay:-1s; }
+@keyframes sway { from { transform:rotate(-2.2deg); } to { transform:rotate(2.2deg); } }
+
+/* An arch: a roof and what stands under it and hangs from it, measured off
+   its own width (cqw) so the parts cannot drift apart at any size. The
+   roof's bracket band runs from 3.75% to 96.25% of its width and ends at its
+   bottom edge: the pillars stand under its two ends, the lanterns hang from
+   its underside. The roof is drawn whole ("meet"): cropping it cut off the
+   upturned corners of the eaves. */
+/* Pillars are exactly as wide as the painted band at each end of the beam
+   (3.45% of the roof's width), and their outer edges are the beam's, so
+   beam, band and pillar make one straight edge. */
+.arch, .entry-frame, .pavilion { container-type:inline-size; --rh:15cqw; --band-in:3.75cqw; --pillar-w:3.45cqw; }
+.arch { position:relative; margin-inline:auto; }
+.arch-roof {
+  position:relative; z-index:3; width:100%; height:auto; aspect-ratio:1600 / 240; overflow:visible;
+  filter:drop-shadow(0 10px 16px rgba(80,40,10,.22));
+}
+.arch .pillar { top:calc(var(--rh) - 3px); bottom:0; z-index:1; }
+.arch .pillar--l { left:var(--band-in); }
+.arch .pillar--r { right:var(--band-in); }
+.arch-plaque { position:absolute; z-index:4; left:50%; top:calc(var(--rh) * .655); transform:translateX(-50%); padding:10px 26px 8px; white-space:nowrap; }
+.arch-plaque .plaque-zh { font-size:clamp(1.3rem,2vw,1.9rem); }
+.arch-lanterns { position:absolute; z-index:2; top:calc(var(--rh) - 14px); display:flex; align-items:flex-start; }
+/* Cloud about the pillars' feet: the gate stands in the clouds. */
+.arch-foot { position:absolute; z-index:2; bottom:0; width:calc(var(--pillar-w) * 11); max-width:none; transform:translate(-50%, 52%); pointer-events:none; }
+.arch-foot--l { left:calc(var(--band-in) + var(--pillar-w) / 2); }
+.arch-foot--r { left:calc(100% - var(--band-in) - var(--pillar-w) / 2); transform:translate(-50%, 52%) scaleX(-1); }
+
+/* Cloud lines between scenes. */
+.cloudline { position:relative; pointer-events:none; }
+.cloud { position:absolute; left:-10%; width:120%; max-width:none; }
+.xiangyun { position:absolute; width:clamp(200px,24vw,420px); }
+
+.tags { display:flex; flex-wrap:wrap; gap:6px; }
+.tag { font-size:.72rem; letter-spacing:.02em; padding:5px 15px; background:var(--paper-2); color:var(--ink-muted); clip-path:var(--hex-wide); }
+
+/* ============================================================
+   6.  I. THE GATE  (hero)
+============================================================ */
+/* The gate is a query container so its content can be measured off the
+   arch's width (--arch-w) and sit under its roof, between its pillars. */
+.gate {
+  position:relative; min-height:100vh; overflow:hidden; container-type:inline-size;
+  --arch-w:min(100cqw, 1680px);
+  padding-bottom:clamp(150px,22vh,240px);
+}
+/* Above the words, so the banner's cord runs up behind the roof. It holds
+   nothing to click. */
+/* Clear of the nav, so the ornaments standing on the ridge show whole. */
+.gate-arch { position:absolute; z-index:3; top:calc(var(--nav-h) + 6px); bottom:12vh; left:0; right:0; width:var(--arch-w); pointer-events:none; }
+.gate-lanterns { right:calc(var(--band-in) + var(--pillar-w) + 7cqw); gap:clamp(18px,3cqw,44px); }
+
+.gate-wrap {
+  position:relative; z-index:2; max-width:var(--arch-w);
+  display:grid; grid-template-columns:minmax(200px,300px) minmax(0,1fr) auto;
+  gap:clamp(20px,3vw,44px); align-items:center;
+  padding-top:calc(var(--nav-h) + 6px + var(--arch-w) * .15 + clamp(14px,2.6vh,36px));
+  padding-inline:calc(var(--arch-w) * .0375 + var(--pillar-w) + var(--gutter));
+  /* Nothing here belongs above the middle of the roof: the banner's cord
+     would otherwise show between the roof and the nav. */
+  clip-path:inset(calc(var(--nav-h) + 6px + var(--arch-w) * .06) -100vw -100vh);
+}
+
+/* The banner hangs from the roof on a red cord and sways a little. */
+.banner { position:relative; margin:0; transform-origin:50% 4.6%; }
+.banner img { width:100%; max-width:46vh; height:auto; clip-path:var(--banner); filter:drop-shadow(0 18px 24px rgba(60,30,10,.25)); }
+.banner-cord {
+  position:absolute; left:calc(49% - 1px); bottom:95.4%; width:3px; height:60vh;
+  background:linear-gradient(90deg, #7d130e, var(--vermilion), #7d130e);
+}
+.banner::after {                     /* tassel under the lower point */
+  content:""; position:absolute; left:calc(49.6% - 5px); top:93.6%; width:10px; height:46px;
+  background:repeating-linear-gradient(90deg, var(--vermilion) 0 2px, #7d130e 2px 3px);
+  clip-path:polygon(30% 0, 70% 0, 100% 100%, 0 100%);
+}
+
+.gate-text { max-width:720px; }
+.gate-hi { font-style:italic; font-size:1.1rem; color:var(--ink-muted); }
+.gate-name {
+  font-family:var(--font-display); font-weight:var(--display-weight);
+  font-size:clamp(3rem,6.2vw,6rem); line-height:.98; letter-spacing:-.01em;
+  color:var(--ink); margin:4px 0 22px; text-wrap:balance;
+}
+.ink-word { display:inline-block; }
+.gate-name .accent { color:var(--cinnabar); font-style:italic; }
+.about { display:grid; gap:14px; max-width:640px; }
+.about p { font-weight:300; font-size:1.05rem; line-height:1.72; color:var(--ink-2); }
+.about .aside { font-style:italic; color:var(--ink-muted); font-size:.98rem; }
+.about-more { justify-self:start; font-style:italic; color:var(--cinnabar); font-size:.95rem; }
+.about-more:hover { text-decoration:underline; }
+.gate-cta { display:flex; flex-wrap:wrap; gap:10px; margin:26px 0 18px; }
+.socials { display:flex; gap:8px; }
+.icon-link {
+  width:42px; height:42px; display:inline-flex; align-items:center; justify-content:center;
+  background:var(--paper-2); color:var(--ink-muted); clip-path:var(--hex-gem);
+  transition:background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.icon-link svg { width:18px; height:18px; }
+.icon-link:hover { background:var(--cinnabar); color:#fff; }
+
+/* Credentials: three small hall plaques. */
+.creds { list-style:none; display:flex; flex-direction:column; gap:14px; }
+.cred { display:flex; align-items:center; gap:14px; padding:12px 20px 12px 12px; }
+.cred-mark { width:62px; height:62px; flex:none; padding:4px; background:var(--gold); clip-path:var(--oct); }
+.cred-mark img { width:100%; height:100%; object-fit:contain; background:#fff; clip-path:var(--oct); }
+.cred-text { display:flex; flex-direction:column; line-height:1.3; }
+.cred-role { font-weight:600; font-size:1rem; color:var(--gold-hi); }
+.cred-note { font-style:italic; font-size:.92rem; color:#c7cde0; }
+
+/* Behind the text, in front of the sky: clouds may pass under the words, never over them. */
+.cloudline--gate {
+  position:absolute; left:0; right:0; bottom:0; height:clamp(170px,26vw,360px); z-index:1;
+  /* The gate clips at its foot; fade the clouds out before that edge so it
+     never shows as a straight line. */
+  -webkit-mask-image:linear-gradient(to bottom, #000 55%, transparent 98%);
+          mask-image:linear-gradient(to bottom, #000 55%, transparent 98%);
+}
+/* The painted banks are cloud to their top edge: kept low, so they rise
+   only into the empty foot of the gate and never behind its words. */
+.cloudline--gate .cloud--back { bottom:-14%; opacity:.9; }
+.cloudline--gate .cloud--front { bottom:-58%; }
+
+/* ============================================================
+   7.  II. THE DOORS
+   They stand at the front of the software hall, over its first screen.
+   js/scenes.js pins the hall while they swing open; the hall behind, clipped
+   to the doorway until then, widens as you walk in until it is all there is.
+============================================================ */
+.entry { position:absolute; z-index:5; left:0; right:0; top:0; height:100vh; pointer-events:none; }
+.entry-stage { height:100%; display:grid; place-items:center; padding-top:var(--nav-h); }
+/* As large as the screen allows, height included, so the doors fill the view. */
+.entry-frame { position:relative; width:min(1200px, 92vw, 138vh); pointer-events:auto; }
+.entry-plaque {
+  position:absolute; z-index:4; left:50%; top:calc(var(--rh) * .655); transform:translateX(-50%);
+  display:flex; align-items:baseline; gap:12px; padding:9px 24px 8px; white-space:nowrap;
+}
+.entry-plaque .plaque-zh { font-size:clamp(1.2rem,2vw,1.8rem); }
+/* The wall is painted by the doorway's own shadow, spread to fill the gaps
+   either side of it and above it, so the doorway itself stays a hole. */
+.entry-body {
+  --wall:clamp(10px,2.2cqw,26px);
+  position:relative; z-index:1; margin:-3px var(--band-in) 0;
+  display:grid; grid-template-columns:var(--pillar-w) minmax(0,1fr) var(--pillar-w); gap:var(--wall);
+}
+.entry-body .pillar { position:relative; height:auto; }
+/* Perspective lives on the doorway: the doors swing into the hall. */
+.doorway {
+  position:relative; height:min(56vh, 580px); margin-top:var(--wall);
+  display:grid; grid-template-columns:1fr 1fr; perspective:1600px;
+  box-shadow:0 0 0 var(--wall) #9f271c, 0 0 0 calc(var(--wall) + 1px) #7d1a13, inset 0 0 0 3px var(--gold-deep);
+}
+@keyframes turn { to { transform:rotate(360deg); } }
+
+/* 81 gilt studs, nine by nine: the imperial number, on the doors it belongs to.
+   Sized to the cell's width (closest-side), so narrow doors keep round studs. */
+.door {
+  position:relative; z-index:1; display:grid; place-items:center;
+  padding:9% 12%;
+  background:
+    radial-gradient(circle closest-side at 50% 44%, #fff0b8 0 14%, var(--gold-hi) 24%, var(--gold) 40%, var(--gold-deep) 54%, transparent 60%) 0 0 / calc(100% / 9) calc(100% / 9),
+    var(--lacquer-wear),
+    linear-gradient(180deg, rgba(30,6,4,.3), transparent 14%, transparent 86%, rgba(30,6,4,.22)),
+    linear-gradient(90deg, #6e100b, #a8231b 18%, #c3342a 50%, #a8231b 82%, #6e100b);
+  background-origin:content-box, padding-box, padding-box, padding-box;
+  background-clip:content-box, padding-box, padding-box, padding-box;
+  /* The lintel's shadow falls on the leaves' heads. */
+  box-shadow:inset 0 0 0 4px #5c0d09, inset 0 0 0 6px var(--gold-deep), inset 0 16px 22px -8px rgba(30,6,4,.45);
+}
+.door--l { transform-origin:0 50%; }
+.door--r { transform-origin:100% 50%; }
+.door-knocker { position:absolute; top:50%; width:clamp(34px,4vw,52px); transform:translateY(-50%); filter:drop-shadow(0 3px 3px rgba(0,0,0,.4)); }
+.door--l .door-knocker { right:5%; }
+.door--r .door-knocker { left:5%; }
+.entry-steps {
+  position:relative; z-index:2;
+  height:clamp(30px,5cqw,56px); margin:0 calc(var(--band-in) - 2.2cqw);
+  background:
+    var(--wear),
+    repeating-linear-gradient(180deg, #faf6ee 0 12px, #d8cfbd 12px 14px),
+    var(--marble);
+  clip-path:polygon(3% 0, 97% 0, 100% 100%, 0 100%);
+}
+/* Cloud about the foot of the doors, over the steps: the hall stands in the
+   heavens, not on a page. It walks in with the frame and fades with it. */
+.entry-cloud {
+  position:absolute; z-index:3; left:-14%; width:128%; max-width:none; bottom:-19cqw;
+  pointer-events:none; filter:brightness(var(--cloud-b));
+}
+/* Above the roof, on a lacquer tag of its own, so it reads against any sky. */
+.entry-hint {
+  position:absolute; z-index:2; top:calc(var(--nav-h) + 16px); left:50%; transform:translateX(-50%); white-space:nowrap;
+  padding:7px 22px; background:rgba(23,15,12,.8); clip-path:var(--hex-wide);
+  font-size:.78rem; letter-spacing:.14em; text-transform:uppercase; color:var(--gold-hi);
+}
+.entry-hint-zh { font-family:var(--font-brush); font-size:1.1rem; letter-spacing:.1em; color:var(--gold); margin-right:6px; }
+
+/* ============================================================
+   8.  III/IV. THE HALLS
+============================================================ */
+.hall { position:relative; padding:0 var(--gutter); }
+.hall--east { padding-top:4vh; padding-bottom:16vh; }
+.hall-shell {
+  position:relative; max-width:var(--maxw); margin:0 auto; overflow:hidden;
+  clip-path:var(--oct-lg);
+  padding:clamp(120px,14vw,190px) clamp(20px,5vw,72px) clamp(48px,7vw,90px);
+  background:
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgba(236,210,138,.22), transparent 70%),
+    linear-gradient(180deg, var(--lacquer-3), var(--lacquer-2) 30%, var(--lacquer) 100%);
+  color:var(--cream);
+  isolation:isolate;
+}
+/* A thin gilt frame just inside the chamfered edge */
+.hall-shell::before {
+  content:""; position:absolute; inset:12px; z-index:-1; pointer-events:none;
+  clip-path:var(--oct-lg);
+  box-shadow:inset 0 0 0 1px rgba(201,162,74,.55);
+}
+.hall-ceiling {
+  position:absolute; left:50%; top:0; width:clamp(420px,52vw,760px); aspect-ratio:1;
+  transform:translate(-50%,-58%); z-index:-1; opacity:.5;
+  -webkit-mask-image:radial-gradient(circle, #000 40%, transparent 70%);
+          mask-image:radial-gradient(circle, #000 40%, transparent 70%);
+}
+.hall-ceiling .medallion { width:100%; height:100%; animation:turn 180s linear infinite; }
+.giant {
+  position:absolute; z-index:-1; right:-1%; top:3%;
+  font-family:var(--font-giant); font-size:clamp(13rem,27vw,25rem); line-height:1;
+  color:var(--gold); opacity:.08; pointer-events:none; user-select:none;
+}
+.hall-head { max-width:760px; margin-bottom:clamp(26px,4vw,44px); }
+.hall-head .eyebrow { color:var(--gold); }
+/* The gold is the background, clipped to the letters, and a background only
+   fills its box: the padding carries it down past the line so the tails of
+   g, j and y are gilded too instead of vanishing. The margin gives it back. */
+.hall-title {
+  font-family:var(--font-display); font-weight:var(--display-weight);
+  font-size:clamp(2.6rem,5.2vw,4.6rem); line-height:1.02;
+  padding:.06em 0 .2em; margin:calc(10px - .06em) 0 calc(12px - .2em);
+  background:linear-gradient(100deg, #b98a2e 0%, var(--gold-hi) 40%, #fff3cc 50%, var(--gold-hi) 60%, #b98a2e 100%);
+  background-size:220% 100%; background-position:var(--sheen, 100%) 0;
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:var(--gold-hi);
+}
+.hall-sub { color:var(--cream-muted); font-weight:300; max-width:60ch; }
+
+/* Filters are seals; pressing one stamps it. */
+.works-bar { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:16px 28px; margin-bottom:28px; }
+.seals { display:flex; flex-wrap:wrap; gap:10px 18px; }
+.seal-chip { display:inline-flex; align-items:center; gap:10px; padding:4px 4px 4px 0; color:var(--cream-muted); transition:color var(--dur) var(--ease); }
+.seal-zh {
+  width:38px; height:38px; display:grid; place-items:center;
+  font-family:var(--font-brush); font-size:1.35rem; line-height:1;
+  color:var(--gold); background:transparent;
+  box-shadow:inset 0 0 0 1.5px rgba(201,162,74,.6);
+  transition:background var(--dur) var(--ease), color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.seal-en { font-size:.8rem; letter-spacing:.1em; text-transform:uppercase; }
+.seal-chip:hover { color:var(--cream); }
+.seal-chip:hover .seal-zh { box-shadow:inset 0 0 0 1.5px var(--gold-hi); }
+.seal-chip[aria-pressed="true"] { color:var(--cream); }
+.seal-chip[aria-pressed="true"] .seal-zh {
+  background:var(--vermilion); color:#fbeed6;
+  box-shadow:inset 0 0 0 2px #fbeed6, inset 0 0 0 4px var(--vermilion);
+}
+.view-toggle { display:inline-flex; gap:4px; }
+.view-toggle button {
+  font-size:.74rem; letter-spacing:.1em; text-transform:uppercase; padding:8px 18px;
+  color:var(--cream-muted); background:rgba(236,210,138,.08); clip-path:var(--hex-wide);
+}
+.view-toggle button[aria-pressed="true"] { background:var(--gold); color:var(--lacquer); }
+
+/* ---------- Gallery ---------- */
+.works { list-style:none; display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:clamp(14px,1.8vw,22px); }
+.work.is-hidden { display:none; }
+.work-link {
+  position:relative; display:flex; flex-direction:column; height:100%;
+  background:linear-gradient(180deg, rgba(58,36,24,.92), rgba(28,17,12,.96));
+  clip-path:var(--oct); color:var(--cream);
+  transform:perspective(900px) rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg));
+  transition:transform 380ms var(--ease-out);
+}
+/* The lantern glow that follows the pointer */
+.work-link::before {
+  content:""; position:absolute; inset:0; z-index:2; pointer-events:none; opacity:0;
+  background:radial-gradient(260px circle at var(--mx,50%) var(--my,30%), rgba(255,214,140,.2), transparent 70%);
+  transition:opacity var(--dur) var(--ease);
+}
+/* Gilt ring on the octagon, drawn as four edges plus four corner diagonals */
+.work-link::after {
+  content:""; position:absolute; inset:0; z-index:3; pointer-events:none;
+  --ring:rgba(201,162,74,.28);
+  background:
+    linear-gradient(var(--ring),var(--ring)) no-repeat var(--oct-cut) 0    / calc(100% - var(--oct-cut) * 2) 1px,
+    linear-gradient(var(--ring),var(--ring)) no-repeat var(--oct-cut) 100% / calc(100% - var(--oct-cut) * 2) 1px,
+    linear-gradient(var(--ring),var(--ring)) no-repeat 0    var(--oct-cut) / 1px calc(100% - var(--oct-cut) * 2),
+    linear-gradient(var(--ring),var(--ring)) no-repeat 100% var(--oct-cut) / 1px calc(100% - var(--oct-cut) * 2),
+    linear-gradient(to bottom right, transparent calc(50% - 1px), var(--ring) calc(50% - 1px), var(--ring) calc(50% + 1px), transparent calc(50% + 1px)) no-repeat 0    0    / var(--oct-cut) var(--oct-cut),
+    linear-gradient(to top right,    transparent calc(50% - 1px), var(--ring) calc(50% - 1px), var(--ring) calc(50% + 1px), transparent calc(50% + 1px)) no-repeat 100% 0    / var(--oct-cut) var(--oct-cut),
+    linear-gradient(to bottom right, transparent calc(50% - 1px), var(--ring) calc(50% - 1px), var(--ring) calc(50% + 1px), transparent calc(50% + 1px)) no-repeat 100% 100% / var(--oct-cut) var(--oct-cut),
+    linear-gradient(to top right,    transparent calc(50% - 1px), var(--ring) calc(50% - 1px), var(--ring) calc(50% + 1px), transparent calc(50% + 1px)) no-repeat 0    100% / var(--oct-cut) var(--oct-cut);
+  transition:--ring var(--dur) var(--ease);
+}
+.work-link:hover::before, .work-link:focus-visible::before { opacity:1; }
+.work-link:hover::after, .work-link:focus-visible::after { --ring:var(--gold-hi); }
+.work-num {
+  position:absolute; z-index:4; top:12px; left:12px; width:44px; height:44px;
+  display:grid; place-items:center; background:rgba(23,15,12,.82);
+  font-family:var(--font-brush); font-size:1.5rem; line-height:1; color:var(--gold-hi);
+  clip-path:var(--diamond);
+}
+.work-media { position:relative; aspect-ratio:16/10; overflow:hidden; background:#120b08; border-bottom:1px solid rgba(201,162,74,.3); }
+.work-media img { width:100%; height:100%; object-fit:cover; transition:transform 900ms var(--ease-out), filter 600ms var(--ease); filter:saturate(.9) brightness(.92); }
+.work-link:hover .work-media img { transform:scale(1.045); filter:saturate(1) brightness(1); }
+/* Left empty on purpose: the image arrives later. A gilt hairline marks the slot. */
+.work-media--empty { background:linear-gradient(160deg, #221410, #140c09); }
+.work-media--empty::after { content:""; position:absolute; inset:14px; box-shadow:inset 0 0 0 1px rgba(201,162,74,.28); clip-path:var(--oct); }
+.work-body { position:relative; display:flex; flex-direction:column; gap:8px; padding:18px 20px 22px; flex:1; }
+.work-meta { font-size:.7rem; letter-spacing:.14em; text-transform:uppercase; color:var(--gold); }
+.work-title { font-family:var(--font-display); font-weight:var(--display-weight); font-size:1.8rem; line-height:1.05; color:var(--gold-hi); }
+.work-hook { font-weight:300; font-size:.94rem; line-height:1.55; color:var(--cream-muted); flex:1; }
+.work-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
+.work-tags span { font-size:.68rem; letter-spacing:.03em; padding:4px 13px; color:var(--gold-hi); background:rgba(236,210,138,.12); clip-path:var(--hex-wide); }
+.work-seal {
+  position:absolute; z-index:4; top:16px; right:16px; width:46px; height:46px;
+  display:grid; place-items:center; font-family:var(--font-brush); font-size:1.7rem; line-height:1;
+  color:#fbeed6; background:var(--vermilion); transform:rotate(-7deg);
+  box-shadow:inset 0 0 0 2px #fbeed6, inset 0 0 0 4px var(--vermilion);
+}
+
+/* The newest work takes the whole first row. */
+.work--featured { grid-column:1 / -1; }
+.work--featured .work-link { display:grid; grid-template-columns:1.25fr 1fr; }
+.work--featured .work-media { aspect-ratio:auto; min-height:320px; border-bottom:0; border-right:1px solid rgba(201,162,74,.3); }
+.work--featured .work-body { justify-content:center; padding:32px clamp(22px,3vw,40px); gap:12px; }
+.work--featured .work-title { font-size:clamp(2.4rem,4vw,3.6rem); }
+.work--featured .work-hook { flex:none; font-size:1.02rem; }
+.work-media--triptych { display:grid; grid-template-columns:repeat(3,1fr); }
+.work-media--triptych img + img { border-left:1px solid rgba(201,162,74,.3); }
+
+/* ---------- Register: the ledger view, for when there are many ---------- */
+.works[data-view="register"] { grid-template-columns:1fr; gap:0; border-top:1px solid rgba(201,162,74,.3); }
+.works[data-view="register"] .work { grid-column:auto; }
+.works[data-view="register"] .work-link {
+  display:grid; grid-template-columns:56px minmax(0,1fr) auto 64px 28px; align-items:center; gap:18px;
+  padding:16px 10px; background:transparent; clip-path:none; transform:none;
+  border-bottom:1px solid rgba(201,162,74,.3);
+}
+.works[data-view="register"] .work-link::before,
+.works[data-view="register"] .work-link::after { display:none; }
+.works[data-view="register"] .work-link:hover { background:rgba(236,210,138,.07); }
+.works[data-view="register"] .work-media,
+.works[data-view="register"] .work-hook,
+.works[data-view="register"] .work-seal { display:none; }
+/* Every cell pinned to row 1: with explicit columns but auto rows, the grid
+   would start a new row whenever a later item's column is left of an
+   earlier one's (the year comes before the title in the markup). */
+.works[data-view="register"] .work-num { position:static; grid-column:1; grid-row:1; width:40px; height:40px; background:transparent; font-size:1.7rem; }
+.works[data-view="register"] .work-body { display:contents; }
+.works[data-view="register"] .work-title { grid-column:2; grid-row:1; font-size:clamp(1.5rem,2.6vw,2.2rem); transition:transform var(--dur) var(--ease); }
+.works[data-view="register"] .work-link:hover .work-title { transform:translateX(8px); }
+.works[data-view="register"] .work-tags { grid-column:3; grid-row:1; margin:0; }
+.works[data-view="register"] .work-meta { grid-column:4; grid-row:1; text-align:right; color:var(--gold-hi); }
+.works[data-view="register"] .work-where { display:none; }
+.register-arrow { grid-column:5; grid-row:1; color:var(--gold); opacity:0; transition:opacity var(--dur) var(--ease); }
+.works[data-view="register"] .work-link:hover .register-arrow { opacity:1; }
+.works[data-view="gallery"] .register-arrow { display:none; }
+/* Positioned by js/works.js (its transform belongs to GSAP): centred on a
+   point to the right of the pointer. */
+.register-preview {
+  position:fixed; z-index:70; left:-150px; top:-94px; width:300px; aspect-ratio:16/10; pointer-events:none;
+  clip-path:var(--oct); background:#120b08; opacity:0;
+  transition:opacity 220ms var(--ease);
+}
+.register-preview.is-on { opacity:1; }
+.register-preview img { width:100%; height:100%; object-fit:cover; }
+.works-empty { color:var(--cream-muted); font-style:italic; padding:24px 0; }
+
+/* ---------- The west wing: jade, and open to the sky ---------- */
+.hall--west { padding-top:4vh; padding-bottom:6vh; --tile-base:#3f8f6b; --tile-dark:#1b5038; --tile-light:#8fd0ab; --ridge:#1e4a38; }
+.pavilion { position:relative; max-width:1400px; margin:0 auto; }
+/* The pavilion's foot is lost in a bank of cloud, which drifts on down
+   towards the library and fades out behind the words there. The hall keeps
+   empty room at its foot for the cloud to fill (see .hall--west). */
+.pavilion-clouds {
+  position:absolute; z-index:3; left:50%; top:calc(100% - 15vw); width:124vw; max-width:none; margin-left:-62vw;
+  pointer-events:none; filter:brightness(var(--cloud-b));
+  -webkit-mask-image:linear-gradient(to bottom, #000 38%, transparent 72%);
+          mask-image:linear-gradient(to bottom, #000 38%, transparent 72%);
+}
+.pavilion .arch-roof { margin-bottom:-3px; filter:drop-shadow(0 10px 16px rgba(20,40,30,.25)); }
+.hall-frame { position:relative; margin:0 var(--band-in); display:grid; grid-template-columns:var(--pillar-w) minmax(0,1fr) var(--pillar-w); gap:clamp(8px,1.6vw,22px); }
+/* The hall and its pillars dissolve at their foot, so the cloud there never
+   has an edge to show through it. */
+.hall--west .hall-frame {
+  -webkit-mask-image:linear-gradient(to bottom, #000 calc(100% - 13vw), transparent calc(100% - 2vw));
+          mask-image:linear-gradient(to bottom, #000 calc(100% - 13vw), transparent calc(100% - 2vw));
+}
+.hall-frame .pillar { position:relative; height:auto; }
+.hall--west .hall-shell {
+  margin:0; width:100%;
+  padding-bottom:calc(clamp(48px,7vw,90px) + 12vw);   /* room for the cloud at its foot */
+  background:
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgba(124,195,156,.18), transparent 70%),
+    linear-gradient(180deg, #1c3a31, #12261f 35%, #0b1714 100%);
+}
+.hall--west .hall-ceiling { opacity:.38; }
+
+/* The clouds between the halls */
+.cloudline--bridge { height:clamp(200px,26vw,380px); margin:-6vh 0 -4vh; z-index:2; }
+.cloudline--bridge .cloud--back { top:10%; opacity:.85; }
+.cloudline--bridge .cloud--front { bottom:0; }
+.xiangyun--1 { left:12%; top:6%; }
+.xiangyun--2 { right:8%; top:34%; width:clamp(150px,17vw,300px); }
+
+/* ============================================================
+   9.  V. THE LIBRARY
+============================================================ */
+/* Above the clouds of the scenes either side of it, which drift in behind its words. */
+.library { position:relative; z-index:2; padding:clamp(120px,18vh,200px) 0 clamp(90px,14vh,160px); color:var(--cream); }
+.library-wrap { position:relative; display:grid; grid-template-columns:minmax(0,1fr) minmax(280px,.9fr); gap:clamp(32px,6vw,90px); align-items:center; }
+.library .eyebrow { color:var(--gold-hi); }
+.library-title { font-family:var(--font-display); font-weight:var(--display-weight); font-size:clamp(2.4rem,4.8vw,4.2rem); line-height:1.02; margin:10px 0 16px; color:#fff4dc; text-wrap:balance; text-shadow:0 1px 3px rgba(70,24,20,.35), 0 2px 30px rgba(70,24,20,.6); }
+.library-text p { font-weight:300; font-size:1.06rem; max-width:52ch; color:#f5e3c8; text-shadow:0 1px 14px rgba(70,24,20,.55); }
+.library-cta { display:flex; flex-wrap:wrap; gap:10px; margin-top:26px; }
+
+/* A closed handscroll, drawn as a solid object by tools/build_scroll.py. */
+.scroll-case {
+  display:block; width:100%; max-width:620px; justify-self:center;
+  transform:rotate(-4deg); transition:transform 600ms var(--ease-out), filter 600ms var(--ease);
+  filter:drop-shadow(0 26px 26px rgba(40,10,10,.38));
+}
+.scroll-case:hover { transform:rotate(-2deg) translateY(-6px); filter:drop-shadow(0 34px 34px rgba(40,10,10,.42)) drop-shadow(0 0 30px rgba(255,200,120,.35)); }
+.scroll-art { width:100%; height:auto; overflow:visible; }
+
+/* ============================================================
+   10. VI. THE BELL TOWER  (contact, at night)
+============================================================ */
+/* Clipped sideways only: the clouds round the roof rise above the tower,
+   into the evening it comes out of. */
+.tower { position:relative; min-height:100vh; display:flex; flex-direction:column; color:var(--cream); overflow-x:clip; --tile-base:#43333a; --tile-dark:#1c1418; --tile-light:#7a5f68; --ridge:#1a1214; --night-dim:.55; --soffit:#0b080c; --braces:none; }
+.tower-arch { width:min(100%, 1680px); }
+.tower-arch .arch-roof { filter:drop-shadow(0 12px 22px rgba(0,0,0,.5)); }
+/* Cloud behind the roof, rising above its ridge and spreading past its
+   ends, and wisps in front of its upturned corners: the roof comes out of
+   the clouds instead of ending against the sky. */
+.tower-cloud { position:absolute; max-width:none; pointer-events:none; filter:brightness(var(--cloud-b)); }
+.tower-cloud--back { z-index:1; left:-16%; width:132%; bottom:calc(100% - var(--rh) * .9); }
+.tower-cloud--l, .tower-cloud--r { z-index:4; width:clamp(200px,26cqw,480px); top:calc(var(--rh) * .3); }
+.tower-cloud--l { left:-9cqw; }
+.tower-cloud--r { right:-9cqw; transform:scaleX(-1); }
+.tower-lanterns { left:calc(var(--band-in) + 6cqw); right:calc(var(--band-in) + 6cqw); justify-content:space-between; }
+.tower-wrap { position:relative; z-index:2; width:100%; max-width:900px; text-align:center; display:grid; justify-items:center; gap:18px; padding-top:clamp(170px,22vh,250px); padding-bottom:clamp(90px,16vh,180px); }
+.tower .eyebrow { color:var(--gold-hi); }
+.tower-title { font-family:var(--font-display); font-weight:var(--display-weight); font-size:clamp(2.4rem,5vw,4.4rem); line-height:1.04; color:#fff4dc; text-wrap:balance; }
+.tower-lead { font-weight:300; font-size:1.08rem; max-width:56ch; color:#d9cdb4; }
+.tower-btns { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:12px; }
+.footer {
+  position:relative; z-index:2; margin-top:auto; display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap;
+  padding:22px var(--gutter) 26px; font-size:.84rem; color:#b9ab8f;
+  background:linear-gradient(180deg, #0c0914, #07060c);
+}
+.footer::before { content:""; position:absolute; left:0; right:0; top:0; height:6px; background:url("../assets/bg/silk-band.png") repeat-x; background-size:auto 6px; }
+.footer-sign { display:inline-flex; align-items:center; gap:12px; }
+.footer .seal { width:34px; height:34px; }
+.footer a:hover { color:var(--gold-hi); }
+
+/* ============================================================
+   11. TRAVEL  — clouds roll in from both sides, meet, and part
+============================================================ */
+.travel { position:fixed; inset:0; z-index:90; pointer-events:none; overflow:hidden; }
+.travel.is-closed { pointer-events:auto; }
+/* The wall (tools/prepare_art.py builds it from the 2:3 painting) is solid
+   up to 48vh from its right edge, at this height, and billows beyond. A bank
+   is as wide as it must be for that solid part to pass the middle of the
+   screen while its outer edge still meets the screen's edge. */
+.travel-cloud { position:absolute; top:-12vh; height:124vh; width:calc(58vw + 48vh); will-change:transform; }
+.travel-cloud::before { content:""; position:absolute; inset:0; background:url("../assets/art/cloud-wall-wide.webp") right center / auto 100% no-repeat; }
+.travel-cloud--l { left:0; transform:translateX(-102%); }
+.travel-cloud--r { right:0; transform:translateX(102%); }
+.travel-cloud--r::before { transform:scaleX(-1); }
+
+/* ============================================================
+   12. A PROJECT HALL  (the room, and its edict)
+============================================================ */
+.room {
+  position:fixed; inset:0; z-index:80; overflow-y:auto; overscroll-behavior:contain;
+  background:
+    radial-gradient(ellipse 60% 45% at 50% 0%, rgba(236,210,138,.2), transparent 70%),
+    linear-gradient(180deg, #3a2014, #1f120d 40%, #120a08);
+  color:var(--cream);
+}
+.room[data-wing="west"] {
+  background:
+    radial-gradient(ellipse 60% 45% at 50% 0%, rgba(124,195,156,.18), transparent 70%),
+    linear-gradient(180deg, #1c3a31, #10231d 40%, #08120f);
+}
+.room-ceiling {
+  position:fixed; left:50%; top:0; width:min(900px,120vw); aspect-ratio:1; transform:translate(-50%,-62%);
+  opacity:.55; pointer-events:none;
+  -webkit-mask-image:radial-gradient(circle, #000 42%, transparent 70%); mask-image:radial-gradient(circle, #000 42%, transparent 70%);
+}
+.room-ceiling .medallion { width:100%; height:100%; animation:turn 160s linear infinite; }
+.room-pillar { position:fixed; top:0; bottom:0; width:var(--pillar-w); background:linear-gradient(90deg, #4f0a07 0%, #8f1a13 16%, #c0372b 40%, #d6533f 50%, #b72c22 62%, #86170f 84%, #4a0906 100%); }
+.room-pillar--l { left:0; }
+.room-pillar--r { right:0; }
+.room-leave {
+  position:fixed; z-index:3; top:18px; left:calc(var(--pillar-w) + 18px);
+  display:inline-flex; gap:8px; align-items:center; padding:10px 22px;
+  font-size:.8rem; letter-spacing:.08em; color:var(--gold-hi); background:rgba(23,15,12,.7); clip-path:var(--hex-wide);
+}
+.room-leave:hover { background:var(--gold); color:var(--lacquer); }
+.room-nav {
+  position:fixed; z-index:3; top:50%; transform:translateY(-50%);
+  display:flex; flex-direction:column; align-items:center; gap:6px; max-width:120px; padding:14px 10px;
+  color:var(--cream-muted); text-align:center; font-size:.76rem; letter-spacing:.06em;
+  transition:color var(--dur) var(--ease);
+}
+.room-nav--prev { left:calc(var(--pillar-w) + 6px); }
+.room-nav--next { right:calc(var(--pillar-w) + 6px); }
+.room-nav-num {
+  width:52px; height:52px; display:grid; place-items:center; font-family:var(--font-brush); font-size:1.7rem; line-height:1;
+  color:var(--gold-hi); background:rgba(23,15,12,.8); clip-path:var(--diamond);
+  transition:background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.room-nav:hover { color:var(--cream); }
+.room-nav:hover .room-nav-num { background:var(--gold); color:var(--lacquer); }
+
+/* Rollers, for the edicts and the handscroll: wooden cylinders, lit from the
+   upper left, with a turned jade knob and gold collar at each end. The knob
+   is drawn pointing up and turned for the other ends. */
+:root {
+  --knob:polygon(30% 100%, 70% 100%, 70% 90%, 64% 84%, 90% 70%, 100% 52%, 97% 32%, 84% 14%, 64% 3%, 50% 0, 36% 3%, 16% 14%, 3% 32%, 0 52%, 10% 70%, 36% 84%, 30% 90%);
+  --knob-side:polygon(100% 30%, 100% 70%, 90% 70%, 84% 64%, 70% 90%, 52% 100%, 32% 97%, 14% 84%, 3% 64%, 0 50%, 3% 36%, 14% 16%, 32% 3%, 52% 0, 70% 10%, 84% 36%, 90% 30%);
+  --jade-knob:linear-gradient(var(--knob-collar-dir, 0deg), #6b4a14 0 6%, #f2d58a 6% 9%, #a97d2a 9% 13%, transparent 13%),
+              radial-gradient(ellipse 70% 60% at 36% 32%, #e6fff7 0, #96dfc8 16%, #35a08a 46%, #17604f 76%, #0a2f27 100%);
+  --wood-across:linear-gradient(90deg, #1e0d07, #5a2e12 14%, #a8682e 34%, #e8b36c 46%, #c48644 56%, #6a3816 80%, #1a0b06);
+  --wood-down:linear-gradient(180deg, #1e0d07, #5a2e12 14%, #a8682e 34%, #e8b36c 46%, #c48644 56%, #6a3816 80%, #1a0b06);
+}
+
+/* The edict: paper between two rollers, unrolled by js/room.js. */
+.edict { position:relative; z-index:2; width:min(880px, calc(100% - 2 * var(--pillar-w) - 180px)); margin:clamp(90px,14vh,150px) auto 90px; }
+.edict-roller {
+  height:24px; margin:0 -22px; background:var(--wood-down);
+  position:relative; z-index:2; box-shadow:0 8px 16px rgba(0,0,0,.35);
+}
+.edict-roller::before, .edict-roller::after, .handscroll-roller::before, .handscroll-roller::after {
+  content:""; position:absolute; background:var(--jade-knob);
+  filter:drop-shadow(0 4px 5px rgba(0,0,0,.4));
+}
+.edict-roller::before, .edict-roller::after { top:50%; width:34px; height:38px; margin-top:-19px; clip-path:var(--knob-side); --knob-collar-dir:270deg; }
+.edict-roller::before { left:-31px; }
+.edict-roller::after { right:-31px; transform:scaleX(-1); }
+.edict-paper {
+  position:relative; background:var(--paper) url("../assets/bg/silk-ground.png") repeat; background-size:408px 87px;
+  color:var(--ink-2); box-shadow:0 30px 60px rgba(0,0,0,.35);
+}
+.edict-paper::before { content:""; position:absolute; left:0; right:0; top:0; height:10px; background:url("../assets/bg/silk-band.png") repeat-x; background-size:auto 10px; }
+.edict-content { padding:34px clamp(22px,4vw,48px) 44px; }
+
+.detail { display:flex; flex-direction:column; gap:26px; }
+.detail-media img { width:100%; max-height:54vh; object-fit:cover; cursor:zoom-in; clip-path:var(--oct); }
+.detail-media--empty { height:clamp(180px,26vh,280px); background:linear-gradient(160deg, var(--paper-2), #ddcca5); clip-path:var(--oct); position:relative; }
+.detail-media--empty::after { content:""; position:absolute; inset:12px; box-shadow:inset 0 0 0 1px var(--line); clip-path:var(--oct); }
+.detail-media--triptych { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+.detail-media--triptych figure { margin:0; display:grid; gap:6px; }
+.detail-media--triptych img { aspect-ratio:1; }
+.detail-media--triptych figcaption { font-size:.72rem; letter-spacing:.06em; color:var(--ink-muted); text-align:center; }
+.detail-body { display:flex; flex-direction:column; gap:14px; }
+.detail-index { display:flex; align-items:center; gap:10px; font-size:.74rem; letter-spacing:.14em; text-transform:uppercase; color:var(--cinnabar); }
+.detail-num { font-family:var(--font-brush); font-size:1.6rem; letter-spacing:0; line-height:1; }
+.detail-title { font-family:var(--font-display); font-weight:var(--display-weight); font-size:clamp(2.4rem,4.4vw,3.6rem); line-height:1.02; color:var(--ink); }
+.detail-meta { font-size:.8rem; letter-spacing:.06em; color:var(--cinnabar); }
+.detail-prose { font-weight:300; font-size:1.06rem; line-height:1.75; }
+.detail-bullets { list-style:none; display:grid; gap:9px; }
+.detail-bullets li { position:relative; padding-left:20px; font-weight:300; line-height:1.6; }
+.detail-bullets li::before { content:""; position:absolute; left:2px; top:.62em; width:7px; height:7px; background:var(--cinnabar); clip-path:var(--diamond); }
+.detail-foot { display:flex; flex-wrap:wrap; gap:18px 28px; margin-top:6px; }
+.detail-link { font-weight:600; color:var(--cinnabar); letter-spacing:.02em; }
+.detail-link:hover { text-decoration:underline; }
+
+/* ============================================================
+   13. THE HANDSCROLL  (résumé)
+============================================================ */
+.handscroll {
+  position:fixed; inset:0; z-index:85; display:grid; place-items:center;
+  background:radial-gradient(ellipse at 50% 30%, rgba(236,210,138,.16), transparent 60%), linear-gradient(180deg, #2a1411, #120a0c);
+}
+.handscroll-close {
+  position:absolute; top:18px; left:18px; z-index:3; display:inline-flex; gap:8px; align-items:center; padding:10px 22px;
+  font-size:.8rem; letter-spacing:.08em; color:var(--gold-hi); background:rgba(23,15,12,.7); clip-path:var(--hex-wide);
+}
+.handscroll-close:hover { background:var(--gold); color:var(--lacquer); }
+.handscroll-hint { position:absolute; top:26px; left:50%; transform:translateX(-50%); font-size:.74rem; letter-spacing:.16em; text-transform:uppercase; color:var(--cream-muted); }
+.handscroll-body { display:flex; align-items:stretch; width:min(1420px, 94vw); height:min(78vh, 760px); }
+.handscroll-roller {
+  width:26px; flex:none; margin:-14px 0; background:var(--wood-across);
+  box-shadow:0 20px 40px rgba(0,0,0,.45); position:relative; z-index:2;
+}
+.handscroll-roller::before, .handscroll-roller::after { left:50%; width:38px; height:34px; margin-left:-19px; clip-path:var(--knob); }
+.handscroll-roller::before { top:-31px; }
+.handscroll-roller::after { bottom:-31px; transform:scaleY(-1); }
+.handscroll-paper {
+  flex:1; min-width:0; overflow-x:auto; overflow-y:hidden; cursor:grab;
+  background:
+    linear-gradient(90deg, rgba(70,40,15,.24), transparent 28px, transparent calc(100% - 28px), rgba(70,40,15,.24)),
+    linear-gradient(var(--gold), var(--gold)) 0 12px / 100% 2px no-repeat,
+    linear-gradient(var(--gold), var(--gold)) 0 calc(100% - 12px) / 100% 2px no-repeat,
+    linear-gradient(180deg, #5c0d09, #9a2219 45%, #6e100b) top / 100% 12px no-repeat,
+    linear-gradient(0deg, #5c0d09, #9a2219 45%, #6e100b) bottom / 100% 12px no-repeat,
+    var(--paper) url("../assets/bg/silk-ground.png") repeat;
+  background-size:auto, 100% 2px, 100% 2px, 100% 12px, 100% 12px, 408px 87px;
+  scrollbar-width:thin; scrollbar-color:var(--gold-deep) transparent;
+}
+.handscroll-paper.is-dragging { cursor:grabbing; }
+.handscroll-track { display:flex; height:100%; padding:44px 36px; gap:0; color:var(--ink-2); }
+.hs-col { flex:none; width:360px; padding:0 34px; border-left:1px solid var(--line); overflow-y:auto; }
+.hs-col:first-child { border-left:0; }
+.hs-col--wide { width:640px; }
+.hs-col--title { display:flex; flex-direction:column; gap:14px; justify-content:center; }
+.hs-seal { width:64px; height:64px; }
+.hs-seal--end { margin-top:30px; width:52px; height:52px; opacity:.9; }
+.hs-name { font-family:var(--font-display); font-weight:var(--display-weight); font-size:3.2rem; line-height:1; color:var(--ink); }
+.hs-contact { list-style:none; display:grid; gap:4px; font-size:.86rem; color:var(--ink-muted); }
+.hs-contact a:hover { color:var(--cinnabar); }
+.hs-pdfs { display:flex; flex-direction:column; align-items:flex-start; gap:8px; margin-top:8px; }
+.hs-cat { font-family:var(--font-display); font-weight:600; font-size:1.5rem; color:var(--cinnabar); margin:0 0 12px; }
+.hs-cat + * { margin-top:0; }
+.hs-col > .hs-cat:not(:first-child) { margin-top:26px; }
+.hs-entry { margin-bottom:22px; }
+.hs-title { font-weight:600; font-size:1.02rem; color:var(--ink); }
+.hs-org { font-size:.84rem; color:var(--ink-muted); }
+.hs-when { font-size:.78rem; letter-spacing:.04em; color:var(--cinnabar); }
+.hs-bullets { list-style:none; display:grid; gap:7px; margin-top:8px; }
+.hs-bullets li { position:relative; padding-left:16px; font-size:.88rem; font-weight:300; line-height:1.55; }
+.hs-bullets li::before { content:""; position:absolute; left:1px; top:.6em; width:6px; height:6px; background:var(--cinnabar); clip-path:var(--diamond); }
+.hs-tags { display:flex; flex-wrap:wrap; gap:5px; margin:6px 0 2px; }
+.hs-tags span { font-size:.68rem; padding:3px 12px; background:var(--paper-2); color:var(--ink-muted); clip-path:var(--hex-wide); }
+.hs-skill { margin-bottom:14px; }
+.hs-label { display:block; font-size:.74rem; letter-spacing:.1em; text-transform:uppercase; color:var(--cinnabar); }
+
+/* ============================================================
+   14. LIGHTBOX
+============================================================ */
+.lightbox { position:fixed; inset:0; z-index:95; display:grid; place-items:center; padding:5vh 5vw; background:rgba(10,6,4,.92); }
+.lightbox-inner { margin:0; display:grid; gap:10px; justify-items:center; }
+.lightbox-inner img { max-width:90vw; max-height:82vh; object-fit:contain; }
+.lightbox-cap { font-size:.8rem; letter-spacing:.04em; color:var(--cream-muted); }
+.lightbox-close { position:absolute; top:16px; right:22px; font-size:2rem; line-height:1; color:var(--cream); }
+
+/* ============================================================
+   15. ARRIVAL  (first visit: the seal presses)
+============================================================ */
+.arrival {
+  position:fixed; inset:0; z-index:100; display:none; place-items:center;
+  background:var(--paper) url("../assets/bg/silk-ground.png") repeat; background-size:408px 87px;
+}
+/* Shown by the inline script in <head>, before first paint, so the gate never
+   flashes underneath. If js/arrival.js never runs, it lets itself out. */
+.arrive .arrival { display:grid; animation:arrival-failsafe .6s ease 6s forwards; }
+@keyframes arrival-failsafe { to { opacity:0; visibility:hidden; } }
+.arrival-seal { width:clamp(110px,14vw,170px); position:relative; z-index:2; }
+.arrival-ink {
+  position:absolute; width:clamp(110px,14vw,170px); aspect-ratio:1; border:0;
+  background:radial-gradient(circle, rgba(166,51,40,.28), transparent 65%); transform:scale(.6); opacity:0;
+}
+
+/* ============================================================
+   16. CURSOR  (a gilt diamond; fine pointers only)
+============================================================ */
+.cursor { position:fixed; left:0; top:0; z-index:110; pointer-events:none; display:none; }
+.has-cursor .cursor { display:block; }
+.has-cursor, .has-cursor a, .has-cursor button { cursor:none; }
+.cursor::before {
+  content:""; position:absolute; left:-6px; top:-6px; width:12px; height:12px;
+  background:var(--gold); clip-path:var(--diamond);
+  box-shadow:0 0 0 1px var(--lacquer);
+  transition:transform 260ms var(--ease-out), background 200ms var(--ease);
+}
+.cursor.is-active::before { transform:scale(3.4); background:rgba(201,162,74,.28); }
+.cursor-label {
+  position:absolute; left:26px; top:-9px; white-space:nowrap;
+  font-size:.7rem; letter-spacing:.16em; text-transform:uppercase; color:var(--gold-hi);
+  background:rgba(23,15,12,.82); padding:3px 10px; clip-path:var(--hex-wide);
+  opacity:0; transition:opacity 200ms var(--ease);
+}
+.cursor.has-label .cursor-label { opacity:1; }
+
+/* ============================================================
+   17. SMALLER SCREENS
+============================================================ */
+@media (max-width:1120px) {
+  .gate-wrap { grid-template-columns:minmax(170px,240px) minmax(0,1fr); }
+  .banner { grid-row:1 / span 2; }
+  .creds { grid-column:2; flex-direction:row; flex-wrap:wrap; }
+  .cred { flex:1 1 240px; }
+}
+@media (max-width:860px) {
+  :root { --pillar-w:18px; }
+  .gate-wrap { grid-template-columns:1fr; padding-inline:calc(var(--arch-w) * .0375 + var(--pillar-w) + 12px); }
+  .banner { grid-row:auto; max-width:230px; margin-inline:auto; order:3; }
+  .banner-cord { height:56px; }
+  .creds { grid-column:auto; flex-direction:column; }
+  .cred { flex:none; }   /* the row layout's 240px basis would become a height */
+  .gate-lanterns { display:none; }
+  .works { grid-template-columns:1fr 1fr; }
+  .work--featured .work-link { grid-template-columns:1fr; }
+  .work--featured .work-media { min-height:200px; border-right:0; border-bottom:1px solid rgba(201,162,74,.3); }
+  .library-wrap { grid-template-columns:1fr; }
+  .scroll-case { max-width:420px; }
+  .edict { width:auto; margin:96px calc(var(--pillar-w) + 14px) 110px; }
+  .edict-roller { margin:0 -8px; }
+  /* Two full-width labels collide on a phone: keep the numeral and an
+     arrow, and leave the hall's name for screen readers only. */
+  .room-nav { top:auto; bottom:14px; transform:none; flex-direction:row; max-width:none; gap:4px; background:rgba(23,15,12,.8); clip-path:var(--hex-wide); padding:6px 14px; color:var(--gold-hi); }
+  .room-nav--prev::before { content:"←"; }
+  .room-nav--next::after { content:"→"; }
+  .room-nav-num { width:34px; height:34px; font-size:1.2rem; }
+  .room-nav-name { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+  .entry-plaque .plaque-en { display:none; }
+  .tower-wrap { padding-top:120px; }
+  /* Narrower, so the rollers' knobs stay on screen; and no hint, since on a
+     phone it reads the ordinary way and the close button needs the room. */
+  .handscroll-body { flex-direction:column; height:84vh; width:calc(100vw - 72px); margin-top:40px; }
+  .handscroll-hint { display:none; }
+  .handscroll-roller { width:auto; height:22px; margin:0 -6px; background:var(--wood-down); }
+  .handscroll-roller::before, .handscroll-roller::after { top:50%; left:auto; width:30px; height:34px; margin:-17px 0 0; clip-path:var(--knob-side); --knob-collar-dir:270deg; }
+  .handscroll-roller::before { left:-27px; }
+  .handscroll-roller::after { bottom:auto; right:-27px; transform:scaleX(-1); }
+  .handscroll-paper { overflow-x:hidden; overflow-y:auto; cursor:auto; }
+  .handscroll-track { flex-direction:column; height:auto; padding:28px 22px; }
+  .hs-col, .hs-col--wide { width:auto; padding:18px 0; border-left:0; border-top:1px solid var(--line); overflow:visible; }
+  .hs-col:first-child { border-top:0; }
+}
+@media (max-width:560px) {
+  .works { grid-template-columns:1fr; }
+  .works[data-view="register"] .work-link { grid-template-columns:44px minmax(0,1fr) 54px; }
+  .works[data-view="register"] .work-tags { display:none; }
+  .works[data-view="register"] .work-meta { grid-column:3; }
+  .register-arrow { display:none; }
+  .hall-shell { padding-top:110px; }
+}
+
+/* ============================================================
+   18. REDUCED MOTION
+   Nothing moves on its own. Transitions become fades (js/travel.js),
+   the doors stand open, and the lanterns hang still.
+============================================================ */
+@media (prefers-reduced-motion:reduce) {
+  .hang, .hall-ceiling .medallion, .room-ceiling .medallion { animation:none; }
+  .entry { display:none; }
+  .work-link, .work-media img, .scroll-case, .btn .arrow { transition:none; }
+}
+/* Without scripts the sky never reaches dusk, and cream text would sit on a
+   morning sky. These sections bring their own evening instead. */
+.no-js .library { background:linear-gradient(180deg, #8a4a3c, #c9603f 60%, #e89a5b); }
+.no-js .tower { background:linear-gradient(180deg, #0b1026, #1c1f3f 60%, #2a2344); }
+/* Without scripts the doors could never open, so they are not drawn. */
+.no-js .entry { display:none; }

@@ -1,0 +1,11 @@
+# The paintings as they came from the image generator (about 16 MB). The site
+# loads the prepared versions in assets/art/; keep the originals beside the
+# repo and run tools/prepare_art.py when one changes.
+assets/img/Belltower.png
+assets/img/Cloud1.png
+assets/img/Cloud2.png
+assets/img/Cloudswide*.png
+assets/img/Cloudwall.png
+assets/img/Farheavens.png
+
+__pycache__/
